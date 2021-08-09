@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>building a “no sweat” word embeddings | brianHu</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="building a “no sweat” word embeddings" />
+<meta name="author" content="Brian Hu" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="https://galaxie500.github.io/2019/01/03/word_embeddings.html" />
+<meta property="og:url" content="https://galaxie500.github.io/2019/01/03/word_embeddings.html" />
+<meta property="og:site_name" content="brianHu" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-01-03T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="building a “no sweat” word embeddings" />
+<script type="application/ld+json">
+{"description":"Introduction","@type":"BlogPosting","headline":"building a “no sweat” word embeddings","dateModified":"2019-01-03T00:00:00+00:00","datePublished":"2019-01-03T00:00:00+00:00","url":"https://galaxie500.github.io/2019/01/03/word_embeddings.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2019/01/03/word_embeddings.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
+  <script src="/assets/js/jquery.magnific-popup.js"></script>
+  <!--mathJax-->
+  
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  
+</head>
+<body><div class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">brianHu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <span class="social_links">
+        
+        
+        <a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://github.com/galaxie500"><i class="fab fa-github-square"></i></a>
+        
+        
+    </span>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        
+  <div class="author-box">
+    
+    
+        <img src="
+            https://gravatar.com/avatar/014519ba564bb4fe618246348fbda119?s=256
+        " class="author-avatar" alt="Avatar" />
+    
+Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+
+</div>
+
+
+<div class="post">
+  <h1 class="post-title">building a "no sweat" word embeddings</h1>
+  
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/ml/">ml</a>
+      
+      <a class="tag" href="/tag/nlp/">nlp</a>
+      
+      <a class="tag" href="/tag/introduction/">introduction</a>
+      
+  </div>
+  
+  <div class="post-date">Published on 03 Jan 2019</div>
+  
+  <h1 id="introduction">Introduction</h1>
+
+<p>The large number of English words can make language-based applications daunting.  To cope with this, it is helpful to have a clustering or embedding of these words, so that words with similar meanings are clustered together, or have embeddings that are close to one another.</p>
+
+<p>But how can we get at the meanings of words?  John Firth (1957) put it thus:</p>
+<blockquote>
+  <p>“You shall know a word by the company it keeps.”</p>
+</blockquote>
+
+<p>That is, words that tend to appear in similar contexts are likely to be related.</p>
+
+<p>In this article, I will investigate this idea by coming up with a <strong>100 dimensional embedding of words</strong> that is based on co-occurrence statistics.</p>
+
+<p>The description here assumes you are using Python with NLTK.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="n">nltk</span><span class="p">.</span><span class="n">download</span><span class="p">(</span><span class="s">'brown'</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">brown</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">digits</span><span class="p">,</span> <span class="n">punctuation</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[nltk_data] Downloading package brown to
+[nltk_data]     /Users/galaxie500/nltk_data...
+[nltk_data]   Package brown is already up-to-date!
+</code></pre></div></div>
+
+<ul>
+  <li>Prepare data</li>
+</ul>
+
+<p>First, download the Brown corpus (using <code class="language-plaintext highlighter-rouge">nltk.corpus</code>).  This is a collection of text samples from a wide range of sources, with a total of over a million words.  Calling <code class="language-plaintext highlighter-rouge">brown.words()</code> returns this text in one long list, which is useful.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">brown</span><span class="p">.</span><span class="n">words</span><span class="p">()))</span>
+<span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">brown</span><span class="p">.</span><span class="n">words</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Length of raw Brown corpus: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'nltk.corpus.reader.util.ConcatenatedCorpusView'&gt;
+Length of raw Brown corpus: 1161192
+</code></pre></div></div>
+
+<h2 id="a-step-by-step-build-a-100-dimensional-embeddings">(a) Step-by-Step: build a 100-dimensional embeddings</h2>
+
+<ul>
+  <li>Lowercase and Remove stopwords, punctuation</li>
+</ul>
+
+<p>Remove stopwords and punctuation, make everything lowercase, and count how often each word occurs. Use this to come up with two lists:</p>
+<ol>
+  <li><em>A vocabulary V</em>, consisting of a few thousand (e.g., 5000) of the most commonly-occurring words.</li>
+  <li><em>A shorter list C</em> of at most 1000 of the most commonly-occurring words, which we shall call context words.</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># clean text data
+</span><span class="k">def</span> <span class="nf">preprocessing</span><span class="p">(</span><span class="n">corpus</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus</span><span class="p">)):</span>
+        <span class="n">corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corpus</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">translate</span><span class="p">(</span><span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">punctuation</span><span class="p">))</span>
+        <span class="c1">#corpus[i] = corpus[i].translate(str.maketrans('', '', digits))
+</span>        <span class="n">corpus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corpus</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">lower</span><span class="p">()</span>
+    
+    <span class="n">stop_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="p">.</span><span class="n">words</span><span class="p">())</span>
+    <span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">corpus</span> <span class="k">if</span> <span class="n">w</span><span class="o">!=</span><span class="s">''</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">stop_words</span><span class="p">]</span> <span class="c1">#remove empty string and stopwords
+</span>    <span class="k">return</span> <span class="n">corpus</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">words</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Generate <em>vocabulary V</em> and <em>shorter list C</em></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">extract_frequent_words</span><span class="p">(</span><span class="n">word_list</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">collections</span><span class="p">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+    <span class="n">word_count</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Word'</span><span class="p">:</span><span class="nb">list</span><span class="p">(</span><span class="n">count</span><span class="p">.</span><span class="n">keys</span><span class="p">()),</span> <span class="s">'Count'</span><span class="p">:</span><span class="nb">list</span><span class="p">(</span><span class="n">count</span><span class="p">.</span><span class="n">values</span><span class="p">())}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">word_count</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'Count'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">freq</span><span class="p">]</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">selected</span><span class="p">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">selected</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">C_df</span> <span class="o">=</span> <span class="n">extract_frequent_words</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">C_list</span> <span class="o">=</span> <span class="n">C_df</span><span class="p">.</span><span class="n">Word</span><span class="p">.</span><span class="n">values</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">V_df</span> <span class="o">=</span> <span class="n">extract_frequent_words</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">V_df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'V_words'</span><span class="p">,</span> <span class="s">'window_Count'</span><span class="p">]</span>
+<span class="n">V_list</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">.</span><span class="n">V_words</span><span class="p">.</span><span class="n">values</span>
+</code></pre></div></div>
+
+<p>For each word \(w \in V\), and each occurrence of it in the text stream, look at the surrounding window of four words (two before, two after):</p>
+
+\[w_1 \quad w_2 \quad w \quad w_3 \quad w_4\]
+
+<p>Keep count of how often context words from \(C\) appear in these positions around word \(w\).  That is, for \(w \in V\), \(c \in C\), define:</p>
+
+<p>\(n(w,c) =\) # of times c occurs in a window around \(w\)</p>
+
+<p>Using these counts, construct the probability distribution \(Pr(c \vert w)\) of context words around \(w\)(for each \(w \in V\)), as well as the overall distribution <em>Pr(c)</em> of context words.  These are distributions over \(C\).</p>
+
+<ul>
+  <li>Calculate \(Pr(c \vert w)\)</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># track all the positions that word w showed up in the text stream
+</span><span class="n">V_pos</span> <span class="o">=</span> <span class="p">[[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">V_list</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Windows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">context_word_count</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">V_pos</span><span class="p">:</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># context words surrounding w for w in V
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">cur_window</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">cur_window</span> <span class="o">=</span> <span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cur_window</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span>
+        
+        <span class="c1"># exclude duplicate context words in a single window
+</span>        <span class="n">cur_unique</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">cur_window</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur_unique</span><span class="p">:</span>
+                <span class="n">cur_unique</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        
+        <span class="n">window</span> <span class="o">+=</span> <span class="n">cur_unique</span>
+    
+    <span class="c1"># count occurrence of each context word for words in window w
+</span>    <span class="n">context_word_count</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">collections</span><span class="p">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">window</span><span class="p">).</span><span class="n">values</span><span class="p">())</span>
+    
+    <span class="c1"># remove duplicated context words
+</span>    <span class="n">context_word_unique</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">window</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context_word_unique</span><span class="p">:</span>
+            <span class="n">context_word_unique</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            
+    <span class="n">Windows</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_word_unique</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">V_df</span><span class="p">[</span><span class="s">'context_words'</span><span class="p">]</span> <span class="o">=</span> <span class="n">Windows</span>
+<span class="n">V_df</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">.</span><span class="n">explode</span><span class="p">(</span><span class="s">'context_words'</span><span class="p">)</span>
+<span class="n">V_df</span><span class="p">[</span><span class="s">'countext_word_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">context_word_count</span>
+<span class="n">V_df</span><span class="p">[</span><span class="s">'Pr(c|w)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">[</span><span class="s">'countext_word_count'</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="s">'float'</span><span class="p">)</span><span class="o">/</span><span class="n">V_df</span><span class="p">[</span><span class="s">'window_Count'</span><span class="p">]</span>
+<span class="n">V_df</span><span class="p">[</span><span class="s">'in_C'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">C_list</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">V_df</span><span class="p">.</span><span class="n">context_words</span><span class="p">.</span><span class="n">values</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># drop all the rows with context words that are not in our shorter list C
+</span><span class="n">V_df</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">[</span><span class="n">V_df</span><span class="p">.</span><span class="n">in_C</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># drop boolean column 'in_C' after we collect all context words belonged to C
+</span><span class="n">V_df</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s">'in_C'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>V_words</th>
+      <th>window_Count</th>
+      <th>context_words</th>
+      <th>countext_word_count</th>
+      <th>Pr(c|w)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>general</td>
+      <td>1</td>
+      <td>0.006452</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>none</td>
+      <td>1</td>
+      <td>0.006452</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>future</td>
+      <td>1</td>
+      <td>0.006452</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>doctor</td>
+      <td>1</td>
+      <td>0.006452</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>cent</td>
+      <td>1</td>
+      <td>0.006452</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>person</td>
+      <td>1</td>
+      <td>0.052632</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>took</td>
+      <td>1</td>
+      <td>0.052632</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>energy</td>
+      <td>1</td>
+      <td>0.052632</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>said</td>
+      <td>1</td>
+      <td>0.052632</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>interested</td>
+      <td>1</td>
+      <td>0.052632</td>
+    </tr>
+  </tbody>
+</table>
+<p>461410 rows × 5 columns</p>
+</div>
+
+<ul>
+  <li>Calculate <em>Pr(c)</em></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># calculate distribution of context words in C
+</span><span class="n">C_list_uniq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">V_df</span><span class="p">.</span><span class="n">context_words</span><span class="p">.</span><span class="n">unique</span><span class="p">())</span>
+<span class="n">Pr_C</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">C_list_uniq</span><span class="p">:</span>
+    <span class="n">Pr_C</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">V_df</span><span class="p">[</span><span class="s">'Pr(c)'</span><span class="p">]</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">'context_words'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Pr_C</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+<span class="n">V_df</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>V_words</th>
+      <th>window_Count</th>
+      <th>context_words</th>
+      <th>countext_word_count</th>
+      <th>Pr(c|w)</th>
+      <th>in_C</th>
+      <th>Pr(c)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>general</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000950</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>none</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000206</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>future</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000433</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>doctor</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000191</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>cent</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000296</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>person</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000332</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>took</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000813</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>energy</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000191</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>said</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.003741</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>interested</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000200</td>
+    </tr>
+  </tbody>
+</table>
+<p>461410 rows × 7 columns</p>
+</div>
+
+<ul>
+  <li>Calculate <em>pointwise mutual information</em></li>
+</ul>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Represent each vocabulary item \(w\) by a</td>
+      <td>C</td>
+      <td>-dimensional vector \(\phi(w)\), whose \(c\)’th coordinate is:</td>
+    </tr>
+  </tbody>
+</table>
+
+\[\phi_c(w) = max(0, \frac{logPr(c|w)}{Pr(c)})\]
+
+<p>This is known as the (positive) <em>pointwise mutual information</em>, and has been quite successful in work on word embeddings.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">math</span> 
+
+<span class="k">def</span> <span class="nf">pointwise_mutual_info</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'Pr(c|w)'</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'Pr(c)'</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">math</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">a</span><span class="o">/</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">V_df</span><span class="p">[</span><span class="s">'Phi'</span><span class="p">]</span> <span class="o">=</span> <span class="n">V_df</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="n">pointwise_mutual_info</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">V_df</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>V_words</th>
+      <th>window_Count</th>
+      <th>context_words</th>
+      <th>countext_word_count</th>
+      <th>Pr(c|w)</th>
+      <th>in_C</th>
+      <th>Pr(c)</th>
+      <th>Phi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>general</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000950</td>
+      <td>1.915628</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>none</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000206</td>
+      <td>3.444097</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>future</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000433</td>
+      <td>2.701278</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>doctor</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000191</td>
+      <td>3.521058</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>county</td>
+      <td>155</td>
+      <td>cent</td>
+      <td>1</td>
+      <td>0.006452</td>
+      <td>1</td>
+      <td>0.000296</td>
+      <td>3.082803</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>person</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000332</td>
+      <td>5.066159</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>took</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000813</td>
+      <td>4.170775</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>energy</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000191</td>
+      <td>5.620044</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>said</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.003741</td>
+      <td>2.644005</td>
+    </tr>
+    <tr>
+      <th>47101</th>
+      <td>letch</td>
+      <td>19</td>
+      <td>interested</td>
+      <td>1</td>
+      <td>0.052632</td>
+      <td>1</td>
+      <td>0.000200</td>
+      <td>5.571254</td>
+    </tr>
+  </tbody>
+</table>
+<p>461410 rows × 8 columns</p>
+</div>
+
+<ul>
+  <li>Dimension Reduction</li>
+</ul>
+
+<h4 id="before-conducting-dimension-reduction-we-have-to-create-a-sparse-matrix-with-rows-as-v_words-and-columns-as-context-words-the-value-will-be-the-pointwise-mutual-information">Before conducting dimension reduction, we have to create a sparse matrix with rows as V_words and columns as context words, the value will be the <em>pointwise mutual information</em>.</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sparse_table</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">V_df</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="s">'V_words'</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="s">'context_words'</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="s">'Phi'</span><span class="p">)</span>
+<span class="n">sparse_table</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>context_words</th>
+      <th>1</th>
+      <th>10</th>
+      <th>100</th>
+      <th>12</th>
+      <th>15</th>
+      <th>1959</th>
+      <th>1960</th>
+      <th>1961</th>
+      <th>2</th>
+      <th>20</th>
+      <th>...</th>
+      <th>written</th>
+      <th>wrong</th>
+      <th>wrote</th>
+      <th>year</th>
+      <th>years</th>
+      <th>yes</th>
+      <th>yet</th>
+      <th>york</th>
+      <th>young</th>
+      <th>youre</th>
+    </tr>
+    <tr>
+      <th>V_words</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.973217</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4.629721</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3.965613</td>
+      <td>3.781690</td>
+      <td>3.340674</td>
+      <td>1.984232</td>
+      <td>3.333348</td>
+      <td>NaN</td>
+      <td>3.328978</td>
+      <td>3.355489</td>
+      <td>4.750349</td>
+      <td>2.213074</td>
+      <td>...</td>
+      <td>1.830082</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.323740</td>
+      <td>0.651427</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.156607</td>
+      <td>0.913791</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>3.648159</td>
+      <td>NaN</td>
+      <td>4.766189</td>
+      <td>4.731503</td>
+      <td>4.471181</td>
+      <td>NaN</td>
+      <td>3.550520</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4.449519</td>
+      <td>...</td>
+      <td>2.967915</td>
+      <td>NaN</td>
+      <td>2.80637</td>
+      <td>2.614275</td>
+      <td>3.804163</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.294440</td>
+      <td>2.051624</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>3.340674</td>
+      <td>4.766189</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3.919708</td>
+      <td>3.397186</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.734538</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1000</th>
+      <td>4.697981</td>
+      <td>NaN</td>
+      <td>4.989332</td>
+      <td>NaN</td>
+      <td>4.694324</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4.223713</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>youth</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3.502838</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>youve</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>3.928008</td>
+      <td>4.105148</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2.056206</td>
+      <td>NaN</td>
+      <td>2.92709</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3.947681</td>
+    </tr>
+    <tr>
+      <th>zen</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>zg</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5000 rows × 1000 columns</p>
+</div>
+
+<h4 id="here-we-will-be-doing-singular-value-decompositionsvd-to-decompose-the-above-sparse-matrix-to-100-dimension-word-representation">Here, we will be doing <em>Singular Value Decomposition</em>(SVD) to decompose the above sparse matrix to 100 dimension word representation.</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fill NaN with 0s
+</span><span class="n">sparse_table</span> <span class="o">=</span> <span class="n">sparse_table</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
+<span class="c1">#from sklearn.random_projection import sparse_random_matrix
+</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sparse_table</span><span class="p">)</span>
+
+<span class="n">svd</span> <span class="o">=</span> <span class="n">TruncatedSVD</span><span class="p">(</span><span class="n">n_components</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">42</span><span class="p">)</span>
+<span class="n">svd</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">X_new</span> <span class="o">=</span> <span class="n">svd</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">df_new</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">sparse_table</span><span class="p">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">df_new</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>90</th>
+      <th>91</th>
+      <th>92</th>
+      <th>93</th>
+      <th>94</th>
+      <th>95</th>
+      <th>96</th>
+      <th>97</th>
+      <th>98</th>
+      <th>99</th>
+    </tr>
+    <tr>
+      <th>V_words</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.542319</td>
+      <td>-1.995680</td>
+      <td>1.381643</td>
+      <td>-2.909863</td>
+      <td>-3.406599</td>
+      <td>-1.401489</td>
+      <td>-3.144874</td>
+      <td>0.091159</td>
+      <td>0.404984</td>
+      <td>-2.519494</td>
+      <td>...</td>
+      <td>-0.272699</td>
+      <td>0.328477</td>
+      <td>0.218683</td>
+      <td>-0.656883</td>
+      <td>-0.016048</td>
+      <td>-1.542390</td>
+      <td>1.702155</td>
+      <td>-0.510453</td>
+      <td>-1.331743</td>
+      <td>0.531266</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>23.523418</td>
+      <td>-12.896316</td>
+      <td>11.089762</td>
+      <td>-3.408536</td>
+      <td>-9.895360</td>
+      <td>-3.761695</td>
+      <td>0.060779</td>
+      <td>7.032133</td>
+      <td>-1.337786</td>
+      <td>-3.057331</td>
+      <td>...</td>
+      <td>-1.908982</td>
+      <td>1.097818</td>
+      <td>-1.488350</td>
+      <td>-1.397893</td>
+      <td>1.135940</td>
+      <td>-0.119767</td>
+      <td>0.577449</td>
+      <td>-0.072922</td>
+      <td>1.941455</td>
+      <td>1.521440</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>17.485695</td>
+      <td>-4.392681</td>
+      <td>13.806938</td>
+      <td>-0.205896</td>
+      <td>-9.351523</td>
+      <td>-3.323489</td>
+      <td>2.553425</td>
+      <td>-0.650727</td>
+      <td>4.434021</td>
+      <td>-3.258592</td>
+      <td>...</td>
+      <td>-1.889507</td>
+      <td>-1.311489</td>
+      <td>0.508911</td>
+      <td>-1.792407</td>
+      <td>0.841425</td>
+      <td>1.114498</td>
+      <td>0.939590</td>
+      <td>1.554220</td>
+      <td>-1.658337</td>
+      <td>1.261531</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>12.115965</td>
+      <td>-3.480162</td>
+      <td>7.104189</td>
+      <td>-1.246714</td>
+      <td>-4.169442</td>
+      <td>-0.304919</td>
+      <td>1.910621</td>
+      <td>-2.503645</td>
+      <td>2.942702</td>
+      <td>-1.915575</td>
+      <td>...</td>
+      <td>1.479620</td>
+      <td>0.117896</td>
+      <td>-0.171019</td>
+      <td>1.062107</td>
+      <td>1.123733</td>
+      <td>-0.680444</td>
+      <td>-1.128887</td>
+      <td>-1.518986</td>
+      <td>1.168567</td>
+      <td>0.436447</td>
+    </tr>
+    <tr>
+      <th>1000</th>
+      <td>6.748229</td>
+      <td>-3.263267</td>
+      <td>3.999501</td>
+      <td>-1.575692</td>
+      <td>-4.276787</td>
+      <td>-0.313027</td>
+      <td>1.567308</td>
+      <td>-1.057089</td>
+      <td>2.655190</td>
+      <td>-2.324639</td>
+      <td>...</td>
+      <td>0.150966</td>
+      <td>1.584698</td>
+      <td>1.008214</td>
+      <td>1.805991</td>
+      <td>-1.644718</td>
+      <td>0.632643</td>
+      <td>0.848221</td>
+      <td>-0.695705</td>
+      <td>0.090873</td>
+      <td>-0.922286</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>youth</th>
+      <td>13.327412</td>
+      <td>0.517403</td>
+      <td>-2.878062</td>
+      <td>-0.924167</td>
+      <td>2.294374</td>
+      <td>-0.957506</td>
+      <td>-0.091582</td>
+      <td>-3.612247</td>
+      <td>-1.984099</td>
+      <td>-1.501401</td>
+      <td>...</td>
+      <td>0.115512</td>
+      <td>0.774741</td>
+      <td>1.203958</td>
+      <td>3.243366</td>
+      <td>-1.524132</td>
+      <td>-0.470964</td>
+      <td>-1.921117</td>
+      <td>1.201018</td>
+      <td>2.303047</td>
+      <td>-0.377757</td>
+    </tr>
+    <tr>
+      <th>youve</th>
+      <td>13.042776</td>
+      <td>8.514331</td>
+      <td>-6.500516</td>
+      <td>2.708451</td>
+      <td>-5.992631</td>
+      <td>1.492063</td>
+      <td>0.820251</td>
+      <td>-0.925629</td>
+      <td>0.217164</td>
+      <td>-1.467112</td>
+      <td>...</td>
+      <td>-0.712831</td>
+      <td>-1.747105</td>
+      <td>-1.294000</td>
+      <td>0.663011</td>
+      <td>-0.229572</td>
+      <td>0.423359</td>
+      <td>-1.324096</td>
+      <td>-0.035515</td>
+      <td>-0.995549</td>
+      <td>-0.576969</td>
+    </tr>
+    <tr>
+      <th>zen</th>
+      <td>4.458987</td>
+      <td>-1.740182</td>
+      <td>-1.933253</td>
+      <td>-1.843287</td>
+      <td>0.210213</td>
+      <td>-1.749685</td>
+      <td>-0.096430</td>
+      <td>-1.115299</td>
+      <td>-0.678715</td>
+      <td>1.249615</td>
+      <td>...</td>
+      <td>-1.146979</td>
+      <td>-0.144040</td>
+      <td>-0.256134</td>
+      <td>-0.293627</td>
+      <td>0.389218</td>
+      <td>0.439939</td>
+      <td>-0.344095</td>
+      <td>-0.105342</td>
+      <td>0.127606</td>
+      <td>-1.844329</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>6.126870</td>
+      <td>0.258309</td>
+      <td>0.348387</td>
+      <td>-3.972732</td>
+      <td>-0.751711</td>
+      <td>-1.251426</td>
+      <td>-2.420377</td>
+      <td>1.122941</td>
+      <td>0.488333</td>
+      <td>-0.156903</td>
+      <td>...</td>
+      <td>-0.210953</td>
+      <td>0.934246</td>
+      <td>-1.952539</td>
+      <td>1.080573</td>
+      <td>0.198827</td>
+      <td>-0.895675</td>
+      <td>-1.193648</td>
+      <td>-0.156535</td>
+      <td>-0.424499</td>
+      <td>1.452921</td>
+    </tr>
+    <tr>
+      <th>zg</th>
+      <td>3.466457</td>
+      <td>-0.743264</td>
+      <td>-0.012059</td>
+      <td>-1.887242</td>
+      <td>-0.635641</td>
+      <td>-1.200829</td>
+      <td>-3.495046</td>
+      <td>1.720301</td>
+      <td>0.282265</td>
+      <td>0.022144</td>
+      <td>...</td>
+      <td>0.220086</td>
+      <td>-0.863757</td>
+      <td>0.438066</td>
+      <td>1.188732</td>
+      <td>0.514399</td>
+      <td>0.546616</td>
+      <td>-0.517487</td>
+      <td>0.494538</td>
+      <td>0.355671</td>
+      <td>-0.530369</td>
+    </tr>
+  </tbody>
+</table>
+<p>5000 rows × 100 columns</p>
+</div>
+
+<h2 id="b-nearest-neighbor-results">(b) Nearest neighbor results</h2>
+
+<p>Pick a collection of \(25\) words \(w \in V\).  For each \(w\), return its nearest neighbor \(w′\neq w\) in \(V\).  A popular distance measure to use for this is <em>cosine distance</em>:</p>
+
+\[1−\frac{\phi(w)\phi(w′)}{\left\Vert\phi(w)\right\Vert\left\Vert\phi(w′)\right\Vert}\]
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="kn">import</span> <span class="n">cosine_similarity</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">X_new</span><span class="p">)</span>
+<span class="n">S_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">sparse_table</span><span class="p">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">sparse_table</span><span class="p">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="n">np</span><span class="p">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">S_df</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">S_df</span>
+</code></pre></div></div>
+
+<p>Output:</p>
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>V_words</th>
+      <th>0</th>
+      <th>1</th>
+      <th>10</th>
+      <th>100</th>
+      <th>1000</th>
+      <th>10000</th>
+      <th>11</th>
+      <th>12</th>
+      <th>13</th>
+      <th>14</th>
+      <th>...</th>
+      <th>youll</th>
+      <th>young</th>
+      <th>younger</th>
+      <th>youngsters</th>
+      <th>youre</th>
+      <th>youth</th>
+      <th>youve</th>
+      <th>zen</th>
+      <th>zero</th>
+      <th>zg</th>
+    </tr>
+    <tr>
+      <th>V_words</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.000000</td>
+      <td>0.496496</td>
+      <td>0.612922</td>
+      <td>0.704027</td>
+      <td>0.699172</td>
+      <td>0.709779</td>
+      <td>0.758037</td>
+      <td>0.676296</td>
+      <td>0.783534</td>
+      <td>0.703629</td>
+      <td>...</td>
+      <td>0.742794</td>
+      <td>0.753591</td>
+      <td>0.892090</td>
+      <td>0.733692</td>
+      <td>0.792452</td>
+      <td>0.849207</td>
+      <td>0.785617</td>
+      <td>0.843505</td>
+      <td>0.567424</td>
+      <td>0.702720</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.496496</td>
+      <td>1.000000</td>
+      <td>0.270032</td>
+      <td>0.407476</td>
+      <td>0.426005</td>
+      <td>0.598368</td>
+      <td>0.393145</td>
+      <td>0.335564</td>
+      <td>0.439774</td>
+      <td>0.364654</td>
+      <td>...</td>
+      <td>0.725060</td>
+      <td>0.535398</td>
+      <td>0.794009</td>
+      <td>0.707147</td>
+      <td>0.796263</td>
+      <td>0.730820</td>
+      <td>0.776692</td>
+      <td>0.674079</td>
+      <td>0.570495</td>
+      <td>0.772490</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.612922</td>
+      <td>0.270032</td>
+      <td>1.000000</td>
+      <td>0.336588</td>
+      <td>0.410105</td>
+      <td>0.531437</td>
+      <td>0.251751</td>
+      <td>0.242511</td>
+      <td>0.308180</td>
+      <td>0.196244</td>
+      <td>...</td>
+      <td>0.689861</td>
+      <td>0.578702</td>
+      <td>0.622325</td>
+      <td>0.658268</td>
+      <td>0.763801</td>
+      <td>0.776299</td>
+      <td>0.775649</td>
+      <td>0.812817</td>
+      <td>0.780041</td>
+      <td>0.923918</td>
+    </tr>
+    <tr>
+      <th>100</th>
+      <td>0.704027</td>
+      <td>0.407476</td>
+      <td>0.336588</td>
+      <td>1.000000</td>
+      <td>0.471953</td>
+      <td>0.529019</td>
+      <td>0.433712</td>
+      <td>0.423225</td>
+      <td>0.473367</td>
+      <td>0.443475</td>
+      <td>...</td>
+      <td>0.665715</td>
+      <td>0.581621</td>
+      <td>0.759004</td>
+      <td>0.760093</td>
+      <td>0.755221</td>
+      <td>0.645551</td>
+      <td>0.737462</td>
+      <td>0.677804</td>
+      <td>0.749595</td>
+      <td>0.889030</td>
+    </tr>
+    <tr>
+      <th>1000</th>
+      <td>0.699172</td>
+      <td>0.426005</td>
+      <td>0.410105</td>
+      <td>0.471953</td>
+      <td>1.000000</td>
+      <td>0.694203</td>
+      <td>0.532895</td>
+      <td>0.573881</td>
+      <td>0.464923</td>
+      <td>0.510910</td>
+      <td>...</td>
+      <td>0.695655</td>
+      <td>0.760756</td>
+      <td>0.832903</td>
+      <td>0.862806</td>
+      <td>0.841124</td>
+      <td>0.666632</td>
+      <td>0.854410</td>
+      <td>0.928525</td>
+      <td>0.830016</td>
+      <td>0.923236</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>youth</th>
+      <td>0.849207</td>
+      <td>0.730820</td>
+      <td>0.776299</td>
+      <td>0.645551</td>
+      <td>0.666632</td>
+      <td>0.811296</td>
+      <td>0.802807</td>
+      <td>0.837998</td>
+      <td>0.775515</td>
+      <td>0.782112</td>
+      <td>...</td>
+      <td>0.603810</td>
+      <td>0.388828</td>
+      <td>0.612672</td>
+      <td>0.738526</td>
+      <td>0.614601</td>
+      <td>1.000000</td>
+      <td>0.632270</td>
+      <td>0.636307</td>
+      <td>0.708969</td>
+      <td>0.846091</td>
+    </tr>
+    <tr>
+      <th>youve</th>
+      <td>0.785617</td>
+      <td>0.776692</td>
+      <td>0.775649</td>
+      <td>0.737462</td>
+      <td>0.854410</td>
+      <td>0.749709</td>
+      <td>0.773328</td>
+      <td>0.804094</td>
+      <td>0.916708</td>
+      <td>0.787269</td>
+      <td>...</td>
+      <td>0.419042</td>
+      <td>0.478772</td>
+      <td>0.599636</td>
+      <td>0.814881</td>
+      <td>0.294050</td>
+      <td>0.632270</td>
+      <td>1.000000</td>
+      <td>0.650591</td>
+      <td>0.714497</td>
+      <td>0.884929</td>
+    </tr>
+    <tr>
+      <th>zen</th>
+      <td>0.843505</td>
+      <td>0.674079</td>
+      <td>0.812817</td>
+      <td>0.677804</td>
+      <td>0.928525</td>
+      <td>0.815137</td>
+      <td>0.739136</td>
+      <td>0.813954</td>
+      <td>0.856319</td>
+      <td>0.872752</td>
+      <td>...</td>
+      <td>0.774752</td>
+      <td>0.655871</td>
+      <td>0.794671</td>
+      <td>0.668088</td>
+      <td>0.783287</td>
+      <td>0.636307</td>
+      <td>0.650591</td>
+      <td>1.000000</td>
+      <td>0.780444</td>
+      <td>0.809703</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>0.567424</td>
+      <td>0.570495</td>
+      <td>0.780041</td>
+      <td>0.749595</td>
+      <td>0.830016</td>
+      <td>0.770043</td>
+      <td>0.779864</td>
+      <td>0.574442</td>
+      <td>0.784010</td>
+      <td>0.758421</td>
+      <td>...</td>
+      <td>0.762509</td>
+      <td>0.685187</td>
+      <td>0.872117</td>
+      <td>0.858662</td>
+      <td>0.745964</td>
+      <td>0.708969</td>
+      <td>0.714497</td>
+      <td>0.780444</td>
+      <td>1.000000</td>
+      <td>0.531597</td>
+    </tr>
+    <tr>
+      <th>zg</th>
+      <td>0.702720</td>
+      <td>0.772490</td>
+      <td>0.923918</td>
+      <td>0.889030</td>
+      <td>0.923236</td>
+      <td>0.829799</td>
+      <td>0.939233</td>
+      <td>0.771256</td>
+      <td>0.887662</td>
+      <td>0.925314</td>
+      <td>...</td>
+      <td>0.812688</td>
+      <td>0.861458</td>
+      <td>0.917434</td>
+      <td>0.817756</td>
+      <td>0.890121</td>
+      <td>0.846091</td>
+      <td>0.884929</td>
+      <td>0.809703</td>
+      <td>0.531597</td>
+      <td>1.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>5000 rows × 5000 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span><span class="s">'communism'</span><span class="p">,</span> <span class="s">'autumn'</span><span class="p">,</span> <span class="s">'cigarette'</span><span class="p">,</span> <span class="s">'pulmonary'</span><span class="p">,</span> <span class="s">'mankind'</span><span class="p">,</span> 
+            <span class="s">'africa'</span><span class="p">,</span> <span class="s">'chicago'</span><span class="p">,</span> <span class="s">'revolution'</span><span class="p">,</span> <span class="s">'september'</span><span class="p">,</span> <span class="s">'chemical'</span><span class="p">,</span> 
+            <span class="s">'detergent'</span><span class="p">,</span> <span class="s">'dictionary'</span><span class="p">,</span> <span class="s">'storm'</span><span class="p">,</span> <span class="s">'worship'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">S_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">to_check</span><span class="p">:</span>
+    <span class="n">S_dict</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_df</span><span class="p">[</span><span class="n">t</span><span class="p">].</span><span class="n">idxmin</span><span class="p">()</span>
+    
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">S_dict</span><span class="p">:</span>
+    <span class="k">print</span> <span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s"> ------&gt; </span><span class="si">{</span><span class="n">S_dict</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>communism ------&gt; almost
+autumn ------&gt; dawn
+cigarette ------&gt; fingers
+pulmonary ------&gt; artery
+mankind ------&gt; nation
+africa ------&gt; western
+chicago ------&gt; club
+revolution ------&gt; movement
+september ------&gt; december
+chemical ------&gt; drugs
+detergent ------&gt; tubes
+dictionary ------&gt; text
+storm ------&gt; wedding
+worship ------&gt; organized
+</code></pre></div></div>
+
+<p>As we can see from above, some of the nearest neighbors do make sense, like <code class="language-plaintext highlighter-rouge">cigarette -&gt; smelled</code>, <code class="language-plaintext highlighter-rouge">africa -&gt; asia</code>, <code class="language-plaintext highlighter-rouge">september -&gt; december</code>,  <code class="language-plaintext highlighter-rouge">dictionary -&gt; text</code> and <code class="language-plaintext highlighter-rouge">storm -&gt; summer</code>.</p>
+
+</div>
+
+
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+ var disqus_config = function () {
+     this.page.url = 'https://galaxie500.github.io/2019/01/03/word_embeddings.html';
+     this.page.identifier = '/2019/01/03/word_embeddings';
+     this.page.title = 'building a "no sweat" word embeddings';
+ };
+
+ (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+     var d = document, s = d.createElement('script');
+
+     s.src = '//galaxie500-github-io.disqus.com/embed.js';
+
+     s.setAttribute('data-timestamp', +new Date());
+     (d.head || d.body).appendChild(s);
+ })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</div>
+
+
+
+
+<div class="related">
+  <h2>related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2020/12/29/coordinate-descent.html">
+            solving a coordinate descent in 3 ways
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2019/04/16/impute-columns-pyspark.html">
+            Welcome to Jekyll!
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2019/01/09/calibrated_estimation.html">
+            stretching out support vector machine with calibrated estimation
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+  
+  <h2>all tags</h2>
+  <div class="tag-cloud"><a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-3">ml</a> <a href="/tag/nlp/" class="set-2">nlp</a> <a href="/tag/tutorial/" class="set-1">tutorial</a> <a href="/tag/welcome/" class="set-1">welcome</a></div>
+  
+
+
+
+
+<script>
+  let i = 0;
+  const text = '';
+  const speed = parseInt('50');
+  
+  function typeWriter() {
+    if (i < text.length) {
+      document.getElementById('animated-post-description').innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+
+  document.getElementById('animated-post-description').style.display = 'initial';
+  typeWriter();
+
+  // Image modal
+  var $imgs = [];
+  $('img').each(function(idx) {
+    var obj = {
+      src: $(this).attr('src')
+    }
+    $imgs.push(obj);
+    var elem = $(this);
+    $(this).click(function() {
+      $('.modal').magnificPopup('open', idx);
+    });
+  });
+
+  $('.modal').magnificPopup({
+    items: $imgs,
+    type: 'image',
+    closeOnContentClick: true,
+    mainClass: 'mfp-img-mobile',
+    image: {
+      verticalFit: true
+    }
+    
+  });
+</script>
+
+<!--enable latex-->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="wrapper">
+    <div class="credits"><a href="https://github.com/bitbrain/jekyll-dash">dash</a> theme for Jekyll by <a href="https://github.com/bitbrain">bitbrain</a> made with <i class="fas fa-heart"></i><div class="toggleWrapper">
+    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
+    <label for="theme-toggle" class="toggle">
+    <span class="toggle__handler">
+      <span class="crater crater--1"></span>
+      <span class="crater crater--2"></span>
+      <span class="crater crater--3"></span>
+    </span>
+        <span class="star star--1"></span>
+        <span class="star star--2"></span>
+        <span class="star star--3"></span>
+        <span class="star star--4"></span>
+        <span class="star star--5"></span>
+        <span class="star star--6"></span>
+    </label>
+</div>
+<script type="text/javascript">
+const theme = localStorage.getItem('theme');
+
+if (theme === "light") {
+    document.documentElement.setAttribute('data-theme', 'light');
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+}
+const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
+
+function activateDarkTheme() {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	document.getElementById("theme-toggle").className = 'light';
+	window.localStorage.setItem('theme', 'dark');
+}
+
+function activateLightTheme() {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	document.getElementById("theme-toggle").className = 'dark';
+	window.localStorage.setItem('theme', 'light');
+}
+
+if (theme === "dark") {
+    activateDarkTheme();
+} else if (theme === "light") {
+    activateLightTheme();
+} else if  (userPrefers === "light") {
+    activateDarkTheme();
+} else {
+    activateDarkTheme();
+}
+
+function modeSwitcher() {
+	let currentMode = document.documentElement.getAttribute('data-theme');
+	if (currentMode === "dark") {
+	    activateLightTheme();
+	} else {
+	    activateDarkTheme();
+	}
+}
+</script></div>
+  </div>
+</footer>
+
+
+<script>
+      window.FontAwesomeConfig = {
+        searchPseudoElements: true
+      }
+    </script>
+
+  </body>Í
+
+</html>

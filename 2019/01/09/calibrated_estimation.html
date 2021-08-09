@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>stretching out support vector machine with calibrated estimation | brianHu</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="stretching out support vector machine with calibrated estimation" />
+<meta name="author" content="Brian Hu" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="https://galaxie500.github.io/2019/01/09/calibrated_estimation.html" />
+<meta property="og:url" content="https://galaxie500.github.io/2019/01/09/calibrated_estimation.html" />
+<meta property="og:site_name" content="brianHu" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-01-09T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="stretching out support vector machine with calibrated estimation" />
+<script type="application/ld+json">
+{"description":"Introduction","@type":"BlogPosting","headline":"stretching out support vector machine with calibrated estimation","dateModified":"2019-01-09T00:00:00+00:00","datePublished":"2019-01-09T00:00:00+00:00","url":"https://galaxie500.github.io/2019/01/09/calibrated_estimation.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2019/01/09/calibrated_estimation.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
+  <script src="/assets/js/jquery.magnific-popup.js"></script>
+  <!--mathJax-->
+  
+</head>
+<body><div class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">brianHu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <span class="social_links">
+        
+        
+        <a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://github.com/galaxie500"><i class="fab fa-github-square"></i></a>
+        
+        
+    </span>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        
+  <div class="author-box">
+    
+    
+        <img src="
+            https://gravatar.com/avatar/014519ba564bb4fe618246348fbda119?s=256
+        " class="author-avatar" alt="Avatar" />
+    
+Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+
+</div>
+
+
+<div class="post">
+  <h1 class="post-title">stretching out support vector machine with calibrated estimation</h1>
+  
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/introduction/">introduction</a>
+      
+      <a class="tag" href="/tag/ml/">ml</a>
+      
+      <a class="tag" href="/tag/nlp/">nlp</a>
+      
+  </div>
+  
+  <div class="post-date">Published on 09 Jan 2019</div>
+  
+  <h1 id="introduction">Introduction</h1>
+
+<p><strong>Overview</strong>:  this article is about to get <code class="language-plaintext highlighter-rouge">calibrated probability estimates</code> in a text classification problems, calibtration will take place based on a linear svc classfier.</p>
+
+<p><strong>Data</strong>: 3000 lines sentiment text data with labels 0 or 1</p>
+
+<p><strong>Work flow</strong>: (explaination to the methods will be included in each steps)</p>
+<ol>
+  <li>Text preprocessing
+    <ul>
+      <li>Text cleaning</li>
+      <li>Tokenizing</li>
+      <li>Vectorizing</li>
+    </ul>
+  </li>
+  <li>Fitting Support vector machine(run cross-validation to select suitable slack variable)</li>
+  <li>Calibration, learn a monotonic transformation by 3 methods
+    <ul>
+      <li>sigmoid</li>
+      <li>platt scaling</li>
+      <li>isotonic regression</li>
+    </ul>
+  </li>
+  <li>Visualizing result and Conclusion</li>
+</ol>
+
+<p><br /></p>
+<ul>
+  <li>import modules</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">digits</span><span class="p">,</span> <span class="n">punctuation</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.isotonic</span> <span class="kn">import</span> <span class="n">IsotonicRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.calibration</span> <span class="kn">import</span> <span class="n">calibration_curve</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="n">use</span><span class="p">(</span><span class="s">'seaborn-whitegrid'</span><span class="p">)</span>
+</code></pre></div></div>
+<p><br /></p>
+
+<h3 id="step-1-text-preprocessing">Step 1: Text preprocessing</h3>
+
+<p>We will use the sentiment data which contains 3000 lines, each with one sentence followed by a label (0 or 1).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'full_set.txt'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">,</span> <span class="s">'label'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<ul>
+  <li>remove the labels from the sentences and store them separately.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">label</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'label'</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">label</span><span class="p">.</span><span class="n">values</span>
+</code></pre></div></div>
+
+<ul>
+  <li>remove digits and punctuation, and make everything lowercase.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove punctuation
+</span><span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">punctuation</span><span class="p">)))</span>
+<span class="c1"># remove digits
+</span><span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">digits</span><span class="p">)))</span>
+<span class="c1"># lowercase strings
+</span><span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">lower</span><span class="p">())</span>
+</code></pre></div></div>
+
+<ul>
+  <li>remove “stop words”, common words that are useless for classification.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stopwords</span> <span class="o">=</span> <span class="p">[</span><span class="s">'the'</span><span class="p">,</span><span class="s">'a'</span><span class="p">,</span><span class="s">'an'</span><span class="p">,</span><span class="s">'i'</span><span class="p">,</span><span class="s">'he'</span><span class="p">,</span><span class="s">'she'</span><span class="p">,</span><span class="s">'they'</span><span class="p">,</span><span class="s">'to'</span><span class="p">,</span><span class="s">'of'</span><span class="p">,</span><span class="s">'it'</span><span class="p">,</span><span class="s">'from'</span><span class="p">]</span>
+<span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span>\
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">([</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">x</span><span class="p">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">stopwords</span><span class="p">)]))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># check text after preprocessing
+</span><span class="n">s</span>
+</code></pre></div></div>
+<p>output:</p>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>so there is no way for me plug in here in us u...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>good case excellent value</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>great for jawbone</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>tied charger for conversations lasting more th...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>mic is great</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2743</th>
+      <td>just got bored watching jessice lange take her...</td>
+    </tr>
+    <tr>
+      <th>2744</th>
+      <td>unfortunately any virtue in this films product...</td>
+    </tr>
+    <tr>
+      <th>2745</th>
+      <td>in word is embarrassing</td>
+    </tr>
+    <tr>
+      <th>2746</th>
+      <td>exceptionally bad</td>
+    </tr>
+    <tr>
+      <th>2747</th>
+      <td>all in all its insult ones intelligence and hu...</td>
+    </tr>
+  </tbody>
+</table>
+<p>2748 rows × 1 columns</p>
+</div>
+
+<ul>
+  <li>vectorizing: Bag-of-words</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">corpus</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">'sentence'</span><span class="p">].</span><span class="n">values</span>
+
+<span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">max_features</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">).</span><span class="n">toarray</span><span class="p">()</span>
+
+<span class="c1"># add 1 to the end of each row to represente intercepts
+</span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="c1"># check output
+</span><span class="n">X_b</span><span class="p">.</span><span class="n">shape</span>
+</code></pre></div></div>
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(2748, 5001)
+</code></pre></div></div>
+
+<ul>
+  <li>spliting data</li>
+</ul>
+
+<p>Divide the 3000 data points into a training set of size 2200, a calibration set of size 400, and a test set of size 400. Keep the classes balanced (each set should be evenly split between positives and negatives).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mi">4</span><span class="o">/</span><span class="mi">15</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">X_calib</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">y_</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y_</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of X_train: </span><span class="si">{</span><span class="n">X_train</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of y_train: </span><span class="si">{</span><span class="n">y_train</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of X_calib: </span><span class="si">{</span><span class="n">X_calib</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of y_calib: </span><span class="si">{</span><span class="n">y_calib</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of X_test: </span><span class="si">{</span><span class="n">X_test</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Dimension of y_test: </span><span class="si">{</span><span class="n">y_test</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Dimension of X_train: (2015, 5001)
+Dimension of y_train: (2015,)
+Dimension of X_calib: (366, 5001)
+Dimension of y_calib: (366,)
+Dimension of X_test: (367, 5001)
+Dimension of y_test: (367,)
+</code></pre></div></div>
+
+<p><br /></p>
+
+<h3 id="step-2-fitting-support-vector-machinecross-validation-to-select-suitable-slack-variable">Step 2: Fitting Support vector machine(cross-validation to select suitable slack variable)</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">cross_valid</span><span class="p">(</span><span class="n">C</span><span class="p">):</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">C</span><span class="p">:</span>
+        <span class="n">svc</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+        <span class="n">clf</span> <span class="o">=</span> <span class="n">svc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">score</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">score</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">C</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="n">err</span> <span class="o">=</span> <span class="n">cross_valid</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="s">'-ok'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'slateblue'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xscale</span><span class="p">(</span><span class="s">'log'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Test Error with different C'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'C values (log)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Test Error'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">);</span>
+</code></pre></div></div>
+<p>output:
+<img src="/assets/images/svc_results.png" /></p>
+
+<p>Best C is 0.1 for training set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">svc</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mf">0.1</span><span class="p">).</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error rate on test set: </span><span class="si">{</span><span class="mi">1</span><span class="o">-</span><span class="n">svc</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error rate on test set: 0.16893732970027253
+</code></pre></div></div>
+
+<p><br /></p>
+
+<h3 id="step-3-learning-a-monotonic-transformation">Step 3: Learning a monotonic transformation</h3>
+
+<p>We now have a fixed classifier: the label for \(x\) is \(sign(w \dot x + b)\). We will think of the score on point \(x\)
+as \(z(x) = w \dot x + b\). We want to convert these real-valued scores into probabilities, using a monotonically
+increasing function \(f\): we will predict \(Pr(y = 1|x) = f(z(x))\). We will investigate three choices for \(f\).</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">The squashing function</code></li>
+</ul>
+
+<p>This involves no learning: map score \(z\) to probability \(1/(1+e^{-z})\)</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Platt scaling</code></li>
+</ul>
+
+<p>We will map score \(z\) to probability \(1/(1+e^{-(az+b)})\). Hence \(a,b \in \mathbb{R}\) are parameters to be learned using the calibration set, using maximum-likelihood. That is, we want to find \(a, b\) to minimize</p>
+
+\[\sum_{(x,y)\in C} \ln(1+exp(-y(az(x)+b)))\]
+
+<p>where \(C\) is the calibration set, assuming labels are \(±1\). Since \(z(x)\in R\), this is essentially a one-dimensional logistic regression problem, with data \(\{(z(x),y):(x,y) \in C\}\), and can be solved easily, in 1-2 lines, using <em>sklearn.linear_model.LogisticRegression</em>.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Isotonic regression</code></li>
+</ul>
+
+<p>The idea is to learn a general monotonic function \(f : \mathbb{R} -&gt; [0, 1]\) from scores to probabilities. The data will be \(\{(z(x), y) : (x, y) \in C\}\), assuming the labels are \(y \in \{0, 1\}\) (not \(±1\)). Suppose \(Z\) is a vector of \(z\)-values of the calibration set, and \(Y\) is a vector of corresponding 0-1 labels. (Both are \(400\)-dimensional vectors.)
+To learn the monotonic transform:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.isotonic</span> <span class="kn">import</span> <span class="n">IsotonicRegression</span>
+<span class="n">isotonic_clf</span> <span class="o">=</span> <span class="n">IsotonicRegression</span><span class="p">(</span><span class="n">out_of_bounds</span><span class="o">=</span><span class="err">’</span><span class="n">clip</span><span class="err">’</span><span class="p">)</span>
+<span class="n">isotonic_clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>To get probabilities for points in the test set, let \(Z^*\) be the vector of test set scores. Use:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_probs</span> <span class="o">=</span> <span class="n">isotonic_clf</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Z_star</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><br />
+<a href="https://github.com/galaxie500/dataScienceMiniProjects/tree/main/Calibrated_Estimation">implementing estimator</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CalibratedEstimator</span><span class="p">():</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clf</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">forcing</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">=</span> <span class="n">option</span> <span class="c1"># which option to calibrate
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">forcing</span> <span class="o">=</span> <span class="n">forcing</span> <span class="c1"># forcing intercept b = 0 or not
+</span>        
+    <span class="k">def</span> <span class="nf">__z_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">stdev</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">stdev</span>
+        
+    <span class="k">def</span> <span class="nf">__z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">.</span><span class="n">T</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">__platt_scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">X</span> <span class="o">+</span> <span class="n">b</span><span class="p">)))</span>
+        
+        
+    <span class="k">def</span> <span class="nf">pre_train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">):</span>
+        <span class="s">"""Calculate coefficients trained by pre-defined classifier
+        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">forcing</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># ensure intercepts are 0
+</span>        
+        <span class="bp">self</span><span class="p">.</span><span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">clf</span><span class="p">.</span><span class="n">coef_</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_calib</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">):</span>
+        <span class="s">"""Fit monotonic transformation with options
+        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">forcing</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">X_calib</span> <span class="o">=</span> <span class="n">X_calib</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">z_calib</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__z</span><span class="p">(</span><span class="n">X_calib</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">w</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">==</span> <span class="s">'platt_scaling'</span><span class="p">:</span>    
+            <span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">().</span><span class="n">fit</span><span class="p">(</span><span class="n">z_calib</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">intercept_</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">==</span> <span class="s">'isotonic'</span><span class="p">:</span>
+            <span class="n">Z_c</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__z_score</span><span class="p">(</span><span class="n">z_calib</span><span class="p">)</span> <span class="c1"># calculate Z-score (calib set)
+</span>            <span class="n">Z_c</span> <span class="o">=</span> <span class="n">Z_c</span><span class="p">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">Z_c</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">iso</span> <span class="o">=</span> <span class="n">IsotonicRegression</span><span class="p">(</span><span class="n">out_of_bounds</span><span class="o">=</span><span class="s">'clip'</span><span class="p">).</span><span class="n">fit</span><span class="p">(</span><span class="n">Z_c</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    
+    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+        <span class="s">"""Predict confidence score based on calibrated coefficients
+        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">forcing</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">z_test</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__z</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">w</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">==</span> <span class="s">'sigmoid'</span><span class="p">:</span>
+            <span class="n">prob_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__sigmoid</span><span class="p">(</span><span class="n">z_test</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">==</span> <span class="s">'platt_scaling'</span><span class="p">:</span>
+            <span class="n">prob_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__platt_scaling</span><span class="p">(</span><span class="n">z_test</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">.</span><span class="n">option</span> <span class="o">==</span> <span class="s">'isotonic'</span><span class="p">:</span>
+            <span class="n">Z_t</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__z_score</span><span class="p">(</span><span class="n">z_test</span><span class="p">)</span> <span class="c1"># calculate Z-score (test set)
+</span>            <span class="n">Z_t</span> <span class="o">=</span> <span class="n">Z_t</span><span class="p">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">Z_t</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+            <span class="n">prob_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">iso</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Z_t</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">prob_pred</span>
+    
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">forcing</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">label_pred</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prob</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">label_pred</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<h3 id="step-4-visualizing-result-and-conclusion">Step 4: Visualizing result and Conclusion</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_reliability_diag</span><span class="p">():</span>
+    <span class="n">calibrators</span> <span class="o">=</span> <span class="p">[</span><span class="s">'sigmoid'</span><span class="p">,</span> <span class="s">'platt_scaling'</span><span class="p">,</span> <span class="s">'isotonic'</span><span class="p">]</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ax1</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">"k:"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Perfectly calibrated"</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">calibrators</span><span class="p">:</span>
+        <span class="n">calibrator</span> <span class="o">=</span> <span class="n">CalibratedEstimator</span><span class="p">(</span><span class="n">svc</span><span class="p">,</span> <span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s">'</span><span class="p">).</span><span class="n">pre_train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="n">calibrator</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_calib</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">)</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">calibrator</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">mean_predicted_value</span><span class="p">,</span> <span class="n">fraction_of_positives</span> <span class="o">=</span> <span class="n">calibration_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_predicted_value</span><span class="p">,</span> <span class="n">fraction_of_positives</span><span class="p">,</span> <span class="s">"s-"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s">"SVC + </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s">"SVC + </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s">"</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">"step"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">platt_no_b</span> <span class="o">=</span> <span class="n">CalibratedEstimator</span><span class="p">(</span><span class="n">svc</span><span class="p">,</span> <span class="s">'platt_scaling'</span><span class="p">,</span> <span class="n">forcing</span><span class="o">=</span><span class="bp">True</span><span class="p">).</span><span class="n">pre_train</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">platt_no_b</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_calib</span><span class="p">,</span> <span class="n">y_calib</span><span class="p">)</span>
+    <span class="n">y_pred_no_b</span> <span class="o">=</span> <span class="n">platt_no_b</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="n">mean_predicted_value_no_b</span><span class="p">,</span> <span class="n">fraction_of_positives_no_b</span> <span class="o">=</span> <span class="n">calibration_curve</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_no_b</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_predicted_value_no_b</span><span class="p">,</span> <span class="n">fraction_of_positives_no_b</span><span class="p">,</span> <span class="s">"s-"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"SVC + platt(b=0)"</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_pred_no_b</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s">"SVC + platt(b=0)"</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">"step"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">ax1</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"Fraction of positives"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="p">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">ax1</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">"lower right"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Calibration plots  (reliability curve)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+    <span class="n">ax2</span><span class="p">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">"Mean predicted value"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="p">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"Count"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">"upper center"</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    
+    <span class="n">fig</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'calibration_result.png'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plot_reliability_diag</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>output:
+<img src="/assets/images/calibration_result.png" /></p>
+
+<p><br /></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<ol>
+  <li>
+    <p>For <code class="language-plaintext highlighter-rouge">sigmoid function</code>, calibration did not happen, since the squashing function just transforms real-valued scores \(z(x)\) to a range of \([0, 1]\).</p>
+  </li>
+  <li>
+    <p>From the plot above, we conclude that the reliability curve for <code class="language-plaintext highlighter-rouge">platt scaling</code> with b overlaps the curve that forcing $b=0$, which indicates that the intercept does not affect the calibration result, meanwhile, platt scaling does a better calibration than option 1, as we can see its reliability curve is much closer to perfectly calibrated line.</p>
+  </li>
+  <li>
+    <p>Compared to platt scaling, isotonic regression does not perform better here.</p>
+  </li>
+  <li>
+    <p>Whether to choose platt scaling or istonic regression, it depends on the situation, isotonic regression is suitable for a bigger calibration set.</p>
+  </li>
+  <li>
+    <p>For multiclass predictions, each class was calibrated separately in a OneVsRestClassifier fashion. When predicting probabilities, the calibrated probabilities for each class are predicted separately. As those probabilities do not necessarily sum to one, a postprocessing is performed to normalize them. References: <a href="https://scikit-learn.org/stable/modules/calibration.html">sklearn calibration</a></p>
+  </li>
+</ol>
+
+</div>
+
+
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+ var disqus_config = function () {
+     this.page.url = 'https://galaxie500.github.io/2019/01/09/calibrated_estimation.html';
+     this.page.identifier = '/2019/01/09/calibrated_estimation';
+     this.page.title = 'stretching out support vector machine with calibrated estimation';
+ };
+
+ (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+     var d = document, s = d.createElement('script');
+
+     s.src = '//galaxie500-github-io.disqus.com/embed.js';
+
+     s.setAttribute('data-timestamp', +new Date());
+     (d.head || d.body).appendChild(s);
+ })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</div>
+
+
+
+
+<div class="related">
+  <h2>related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2020/12/29/coordinate-descent.html">
+            solving a coordinate descent in 3 ways
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2019/04/16/impute-columns-pyspark.html">
+            Welcome to Jekyll!
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2019/01/08/airbnb-part-one.html">
+            Introducing waiting functionality
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+  
+  <h2>all tags</h2>
+  <div class="tag-cloud"><a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-3">ml</a> <a href="/tag/nlp/" class="set-2">nlp</a> <a href="/tag/tutorial/" class="set-1">tutorial</a> <a href="/tag/welcome/" class="set-1">welcome</a></div>
+  
+
+
+
+
+<script>
+  let i = 0;
+  const text = '';
+  const speed = parseInt('50');
+  
+  function typeWriter() {
+    if (i < text.length) {
+      document.getElementById('animated-post-description').innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+
+  document.getElementById('animated-post-description').style.display = 'initial';
+  typeWriter();
+
+  // Image modal
+  var $imgs = [];
+  $('img').each(function(idx) {
+    var obj = {
+      src: $(this).attr('src')
+    }
+    $imgs.push(obj);
+    var elem = $(this);
+    $(this).click(function() {
+      $('.modal').magnificPopup('open', idx);
+    });
+  });
+
+  $('.modal').magnificPopup({
+    items: $imgs,
+    type: 'image',
+    closeOnContentClick: true,
+    mainClass: 'mfp-img-mobile',
+    image: {
+      verticalFit: true
+    }
+    
+  });
+</script>
+
+<!--enable latex-->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="wrapper">
+    <div class="credits"><a href="https://github.com/bitbrain/jekyll-dash">dash</a> theme for Jekyll by <a href="https://github.com/bitbrain">bitbrain</a> made with <i class="fas fa-heart"></i><div class="toggleWrapper">
+    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
+    <label for="theme-toggle" class="toggle">
+    <span class="toggle__handler">
+      <span class="crater crater--1"></span>
+      <span class="crater crater--2"></span>
+      <span class="crater crater--3"></span>
+    </span>
+        <span class="star star--1"></span>
+        <span class="star star--2"></span>
+        <span class="star star--3"></span>
+        <span class="star star--4"></span>
+        <span class="star star--5"></span>
+        <span class="star star--6"></span>
+    </label>
+</div>
+<script type="text/javascript">
+const theme = localStorage.getItem('theme');
+
+if (theme === "light") {
+    document.documentElement.setAttribute('data-theme', 'light');
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+}
+const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
+
+function activateDarkTheme() {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	document.getElementById("theme-toggle").className = 'light';
+	window.localStorage.setItem('theme', 'dark');
+}
+
+function activateLightTheme() {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	document.getElementById("theme-toggle").className = 'dark';
+	window.localStorage.setItem('theme', 'light');
+}
+
+if (theme === "dark") {
+    activateDarkTheme();
+} else if (theme === "light") {
+    activateLightTheme();
+} else if  (userPrefers === "light") {
+    activateDarkTheme();
+} else {
+    activateDarkTheme();
+}
+
+function modeSwitcher() {
+	let currentMode = document.documentElement.getAttribute('data-theme');
+	if (currentMode === "dark") {
+	    activateLightTheme();
+	} else {
+	    activateDarkTheme();
+	}
+}
+</script></div>
+  </div>
+</footer>
+
+
+<script>
+      window.FontAwesomeConfig = {
+        searchPseudoElements: true
+      }
+    </script>
+
+  </body>Í
+
+</html>
