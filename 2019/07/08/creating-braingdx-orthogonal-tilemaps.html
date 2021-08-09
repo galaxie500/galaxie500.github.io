@@ -21,12 +21,41 @@
 {"description":"Fist part of a blog-series about my gamejam framework called braingdx.","@type":"BlogPosting","url":"https://galaxie500.github.io/2019/07/08/creating-braingdx-orthogonal-tilemaps.html","headline":"Creating braingdx: orthogonal tilemaps","dateModified":"2019-07-08T00:00:00+00:00","datePublished":"2019-07-08T00:00:00+00:00","author":{"@type":"Person","name":"Brian Hu"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2019/07/08/creating-braingdx-orthogonal-tilemaps.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="icon" type="image/png" href="/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /></head>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
+  <script src="/assets/js/jquery.magnific-popup.js"></script>
+  <!--mathJax-->
+  
+</head>
 <body><div class="site-header">
   <div class="wrapper">
     <a class="site-title" rel="author" href="/">brianHu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
     <span class="social_links">
-        <a class="color-orange-hover" href="https://soundcloud.com/myrealityde"><i class="fab fa-soundcloud"></i></a><a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a><a class="color-red-hover" href="https://bitbrain.itch.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a><a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a><a class="color-yellow-hover" href="https://github.com/bitbrain"><i class="fab fa-github-square"></i></a>
+        
+        
+        <a class="color-orange-hover" href="https://soundcloud.com/myrealityde"><i class="fab fa-soundcloud"></i></a>
+        
+        
+        
+        <a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://bitbrain.itch.io"><i class="fab fa-itch-io"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a>
+        
+        
+        
+        <a class="color-yellow-hover" href="https://github.com/bitbrain"><i class="fab fa-github-square"></i></a>
+        
+        
     </span>
   </div>
 </div>
@@ -66,7 +95,10 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   
   <div class="post-date">Published on 08 Jul 2019</div>
   
-  <div class="post-description">Fist part of a blog-series about my gamejam framework called braingdx.</div>
+  <noscript>
+    <div class="post-description">Fist part of a blog-series about my gamejam framework called braingdx.</div>
+  </noscript>
+  <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
   <p>Welcome to my new blog series where I talk in more detail about a personal project of mine called <a href="https://github.com/bitbrain/braingdx">braingdx</a>. It builds upon <a href="https://libgdx.badlogicgames.com">libgdx</a> and extends it <a href="https://github.com/bitbrain/braingdx#features">with game engine features</a> to avoid writing boilerplate-code.</p>
 
@@ -295,6 +327,51 @@ Instead, you have to write your own z-index ordering logic. Don’t worry though
 
 
 
+
+<script>
+  let i = 0;
+  const text = 'Fist part of a blog-series about my gamejam framework called braingdx.';
+  const speed = parseInt('50');
+  
+  function typeWriter() {
+    if (i < text.length) {
+      document.getElementById('animated-post-description').innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+
+  document.getElementById('animated-post-description').style.display = 'initial';
+  typeWriter();
+
+  // Image modal
+  var $imgs = [];
+  $('img').each(function(idx) {
+    var obj = {
+      src: $(this).attr('src')
+    }
+    $imgs.push(obj);
+    var elem = $(this);
+    $(this).click(function() {
+      $('.modal').magnificPopup('open', idx);
+    });
+  });
+
+  $('.modal').magnificPopup({
+    items: $imgs,
+    type: 'image',
+    closeOnContentClick: true,
+    mainClass: 'mfp-img-mobile',
+    image: {
+      verticalFit: true
+    }
+    
+  });
+</script>
+
+<!--enable latex-->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
       </div>
     </main><footer class="site-footer">
   <div class="wrapper">
@@ -370,6 +447,7 @@ function modeSwitcher() {
         searchPseudoElements: true
       }
     </script>
-  </body>
+
+  </body>Í
 
 </html>

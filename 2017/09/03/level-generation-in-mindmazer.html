@@ -21,12 +21,41 @@
 {"description":"This article shows how I generated levels for my libgdx game and how I applied seeding to generate them.","@type":"BlogPosting","url":"https://galaxie500.github.io/2017/09/03/level-generation-in-mindmazer.html","headline":"Level Generation in Mindmazer","dateModified":"2017-09-03T00:00:00+00:00","datePublished":"2017-09-03T00:00:00+00:00","author":{"@type":"Person","name":"Brian Hu"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2017/09/03/level-generation-in-mindmazer.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css">
-  <link rel="icon" type="image/png" href="/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /></head>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
+  <script src="/assets/js/jquery.magnific-popup.js"></script>
+  <!--mathJax-->
+  
+</head>
 <body><div class="site-header">
   <div class="wrapper">
     <a class="site-title" rel="author" href="/">brianHu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
     <span class="social_links">
-        <a class="color-orange-hover" href="https://soundcloud.com/myrealityde"><i class="fab fa-soundcloud"></i></a><a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a><a class="color-red-hover" href="https://bitbrain.itch.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a><a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a><a class="color-yellow-hover" href="https://github.com/bitbrain"><i class="fab fa-github-square"></i></a>
+        
+        
+        <a class="color-orange-hover" href="https://soundcloud.com/myrealityde"><i class="fab fa-soundcloud"></i></a>
+        
+        
+        
+        <a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://bitbrain.itch.io"><i class="fab fa-itch-io"></i></a>
+        
+        
+        
+        <a class="color-purple-hover" href="https://www.twitch.tv/bitbrain_"><i class="fab fa-twitch"></i></a>
+        
+        
+        
+        <a class="color-red-hover" href="https://www.youtube.com/channel/UCZDjQltHRNiXIYXMBeLDleA"><i class="fab fa-youtube"></i></a>
+        
+        
+        
+        <a class="color-yellow-hover" href="https://github.com/bitbrain"><i class="fab fa-github-square"></i></a>
+        
+        
     </span>
   </div>
 </div>
@@ -60,7 +89,10 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   
   <div class="post-date">Published on 03 Sep 2017</div>
   
-  <div class="post-description">This article shows how I generated levels for my libgdx game and how I applied seeding to generate them.</div>
+  <noscript>
+    <div class="post-description">This article shows how I generated levels for my libgdx game and how I applied seeding to generate them.</div>
+  </noscript>
+  <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
   <p>Today I want to talk about my project <a href="https://github.com/bitbrain/mindmazer">mindmazer</a>. In this simple 2D puzzle game the player has to remember a certain path to progress to the next stage. When starting this project I had to decide if I give the player a static list of predefined levels. After some time I decided against it and went for a procedural generation approach. In this article I am going to explain how these levels are generated.</p>
 
@@ -184,6 +216,51 @@ x x
 
 
 
+
+<script>
+  let i = 0;
+  const text = 'This article shows how I generated levels for my libgdx game and how I applied seeding to generate them.';
+  const speed = parseInt('50');
+  
+  function typeWriter() {
+    if (i < text.length) {
+      document.getElementById('animated-post-description').innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeWriter, speed);
+    }
+  }
+
+  document.getElementById('animated-post-description').style.display = 'initial';
+  typeWriter();
+
+  // Image modal
+  var $imgs = [];
+  $('img').each(function(idx) {
+    var obj = {
+      src: $(this).attr('src')
+    }
+    $imgs.push(obj);
+    var elem = $(this);
+    $(this).click(function() {
+      $('.modal').magnificPopup('open', idx);
+    });
+  });
+
+  $('.modal').magnificPopup({
+    items: $imgs,
+    type: 'image',
+    closeOnContentClick: true,
+    mainClass: 'mfp-img-mobile',
+    image: {
+      verticalFit: true
+    }
+    
+  });
+</script>
+
+<!--enable latex-->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
       </div>
     </main><footer class="site-footer">
   <div class="wrapper">
@@ -259,6 +336,7 @@ function modeSwitcher() {
         searchPseudoElements: true
       }
     </script>
-  </body>
+
+  </body>Í
 
 </html>
