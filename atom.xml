@@ -31,15 +31,7 @@
     <span class="social_links">
         
         
-        <a class="color-orange-hover" href="https://soundcloud.com/myrealityde"><i class="fab fa-soundcloud"></i></a>
-        
-        
-        
         <a class="color-cyan-hover" href="https://twitter.com/bitbrain_"><i class="fab fa-twitter-square"></i></a>
-        
-        
-        
-        <a class="color-red-hover" href="https://bitbrain.itch.io"><i class="fab fa-itch-io"></i></a>
         
         
         
@@ -51,7 +43,7 @@
         
         
         
-        <a class="color-yellow-hover" href="https://github.com/bitbrain"><i class="fab fa-github-square"></i></a>
+        <a class="color-purple-hover" href="https://github.com/galaxie500"><i class="fab fa-github-square"></i></a>
         
         
     </span>
@@ -65,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-09T08:09:08+00:00</updated>
+ <updated>2021-08-09T08:25:00+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
