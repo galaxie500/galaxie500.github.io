@@ -57,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-09T09:42:19+00:00</updated>
+ <updated>2021-08-09T09:56:01+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -308,7 +308,7 @@ Fitting Loss:   -&amp;gt; 0.349902342590921
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Method 2: Pick coordinate $i$ that has greatest gradient in absolute value at each iteration&lt;/li&gt;
+  &lt;li&gt;Method 2: Pick coordinate \(i\) that has greatest gradient in absolute value at each iteration&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# fit training data with coordinate descent model
@@ -461,7 +461,8 @@ more quote text to come&lt;/p&gt;
    <link href="https://galaxie500.github.io/2019/01/09/calibrated_estimation.html"/>
    <updated>2019-01-09T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2019/01/09/calibrated_estimation</id>
-   <content type="html">&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;: 3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;br /&gt;
+&lt;strong&gt;Data&lt;/strong&gt;: 3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Work flow&lt;/strong&gt;: (explaination to the methods will be included in each steps)&lt;/p&gt;
 &lt;ol&gt;
