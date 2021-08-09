@@ -57,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-09T09:37:32+00:00</updated>
+ <updated>2021-08-09T09:37:50+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -66,7 +66,7 @@
 
  
  <entry>
-   <title>Solving a coordinate descent in 3 ways</title>
+   <title>solving a coordinate descent in 3 ways</title>
    <link href="https://galaxie500.github.io/2020/12/29/coordinate-descent.html"/>
    <updated>2020-12-29T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2020/12/29/coordinate-descent</id>
@@ -457,11 +457,15 @@ more quote text to come&lt;/p&gt;
  </entry>
  
  <entry>
-   <title>Stretching out support vector machine with calibrated estimation</title>
+   <title>stretching out support vector machine with calibrated estimation</title>
    <link href="https://galaxie500.github.io/2019/01/09/calibrated_estimation.html"/>
    <updated>2019-01-09T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2019/01/09/calibrated_estimation</id>
-   <content type="html">&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;: 3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
+   <content type="html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;&lt;strong&gt;Overview&lt;/strong&gt;:  this article is about to get &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;calibrated probability estimates&lt;/code&gt; in a text classification problems, calibtration will take place based on a linear svc classfier.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;: 3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Work flow&lt;/strong&gt;: (explaination to the methods will be included in each steps)&lt;/p&gt;
 &lt;ol&gt;
@@ -915,7 +919,7 @@ To learn the monotonic transform:&lt;/p&gt;
  </entry>
  
  <entry>
-   <title>Building a "no sweat" word embeddings</title>
+   <title>building a "no sweat" word embeddings</title>
    <link href="https://galaxie500.github.io/2019/01/03/word_embeddings.html"/>
    <updated>2019-01-03T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2019/01/03/word_embeddings</id>
@@ -923,12 +927,9 @@ To learn the monotonic transform:&lt;/p&gt;
 
 &lt;p&gt;The large number of English words can make language-based applications daunting.  To cope with this, it is helpful to have a clustering or embedding of these words, so that words with similar meanings are clustered together, or have embeddings that are close to one another.&lt;/p&gt;
 
-&lt;p&gt;But how can we get at the meanings of words?&lt;/p&gt;
+&lt;p&gt;But how can we get at the meanings of words?  John Firth (1957) put it thus:&lt;/p&gt;
 &lt;blockquote&gt;
   &lt;p&gt;“You shall know a word by the company it keeps.”&lt;/p&gt;
-  &lt;ul&gt;
-    &lt;li&gt;John Firth (1957)&lt;/li&gt;
-  &lt;/ul&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;That is, words that tend to appear in similar contexts are likely to be related.&lt;/p&gt;
