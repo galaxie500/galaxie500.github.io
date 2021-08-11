@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T07:46:30+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
-</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T08:20:59+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
 
@@ -9,11 +7,11 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;data&quot;&gt;Data&lt;/h1&gt;
+&lt;h3 id=&quot;data&quot;&gt;Data&lt;/h3&gt;
 
 &lt;p&gt;The dataset was downloaded from &lt;a href=&quot;http://insideairbnb.com/get-the-data.html&quot;&gt;InsideAirbnb-Hawaii-data&lt;/a&gt;, the analysis results were based on a span of two year from July, 2019 to July, 2021.&lt;/p&gt;
 
-&lt;h1 id=&quot;prerequisite&quot;&gt;Prerequisite&lt;/h1&gt;
+&lt;h3 id=&quot;prerequisite&quot;&gt;Prerequisite&lt;/h3&gt;
 
 &lt;p&gt;In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;chart-studio&lt;/code&gt;, those can be easily installed via pip under conda environment:&lt;/p&gt;
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;plotly
@@ -24,8 +22,6 @@
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h1 id=&quot;part-1-visualizing-with-matplotlib-and-plotly&quot;&gt;Part 1. Visualizing with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matplotlib&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;&lt;/h1&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;inspecting-data&quot;&gt;Inspecting Data&lt;/h2&gt;
 
@@ -301,7 +297,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;iframe width=&quot;700&quot; height=&quot;450&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
+&lt;iframe width=&quot;730&quot; height=&quot;450&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -316,7 +312,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;part-2-reviews-over-time-via-folium-heatmapwithtime-plugin&quot;&gt;Part 2. Reviews over time via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium HeatMapWithTime&lt;/code&gt; plugin&lt;/h1&gt;
+&lt;h1 id=&quot;part-2-reviews-via-folium-heatmapwithtime-plugin&quot;&gt;Part 2. Reviews via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium HeatMapWithTime&lt;/code&gt; plugin&lt;/h1&gt;
 
 &lt;h2 id=&quot;data-processing&quot;&gt;Data processing&lt;/h2&gt;
 
@@ -754,7 +750,7 @@
   &lt;li&gt;The trend showed from above matches the result acquired by matplotlib.&lt;/li&gt;
   &lt;li&gt;Moreover, timestamped visualization delivers a more approachable result to a variaty of audiences.&lt;/li&gt;
   &lt;li&gt;By taking advantage of geographaic information, we could monitor many other attributes as long as we render them with suitable weights.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Brian Hu</name></author><category term="EDA" /><category term="data-visulization" /><category term="tutorial" /><category term="time-series" /><category term="pandas" /><category term="folium" /><category term="plotly" /><summary type="html"></summary></entry><entry><title type="html">Building a “no sweat” word embeddings</title><link href="https://galaxie500.github.io/2021/07/03/word_embeddings.html" rel="alternate" type="text/html" title="Building a “no sweat” word embeddings" /><published>2021-07-03T00:00:00+00:00</published><updated>2021-07-03T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/07/03/word_embeddings</id><content type="html" xml:base="https://galaxie500.github.io/2021/07/03/word_embeddings.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Brian Hu</name></author><category term="EDA" /><category term="data-visulization" /><category term="tutorial" /><category term="time-series" /><category term="pandas" /><category term="folium" /><category term="plotly" /><summary type="html">Introduction</summary></entry><entry><title type="html">Building a “no sweat” word embeddings</title><link href="https://galaxie500.github.io/2021/07/03/word_embeddings.html" rel="alternate" type="text/html" title="Building a “no sweat” word embeddings" /><published>2021-07-03T00:00:00+00:00</published><updated>2021-07-03T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/07/03/word_embeddings</id><content type="html" xml:base="https://galaxie500.github.io/2021/07/03/word_embeddings.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;The large number of English words can make language-based applications daunting.  To cope with this, it is helpful to have a clustering or embedding of these words, so that words with similar meanings are clustered together, or have embeddings that are close to one another.&lt;/p&gt;
 

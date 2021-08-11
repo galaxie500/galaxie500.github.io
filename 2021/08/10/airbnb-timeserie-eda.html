@@ -98,9 +98,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   </noscript>
   <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
-  <p><br /></p>
-
-<h1 id="introduction">Introduction</h1>
+  <h1 id="introduction">Introduction</h1>
 
 <p>This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.</p>
 
@@ -108,11 +106,11 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h1 id="data">Data</h1>
+<h3 id="data">Data</h3>
 
 <p>The dataset was downloaded from <a href="http://insideairbnb.com/get-the-data.html">InsideAirbnb-Hawaii-data</a>, the analysis results were based on a span of two year from July, 2019 to July, 2021.</p>
 
-<h1 id="prerequisite">Prerequisite</h1>
+<h3 id="prerequisite">Prerequisite</h3>
 
 <p>In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install <code class="language-plaintext highlighter-rouge">plotly</code>, <code class="language-plaintext highlighter-rouge">folium</code>, <code class="language-plaintext highlighter-rouge">chart-studio</code>, those can be easily installed via pip under conda environment:</p>
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>plotly
@@ -123,8 +121,6 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 <p><br /></p>
 
 <h1 id="part-1-visualizing-with-matplotlib-and-plotly">Part 1. Visualizing with <code class="language-plaintext highlighter-rouge">matplotlib</code> and <code class="language-plaintext highlighter-rouge">plotly</code></h1>
-
-<p><br /></p>
 
 <h2 id="inspecting-data">Inspecting Data</h2>
 
@@ -400,7 +396,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p>output:</p>
 
-<iframe width="700" height="450" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
+<iframe width="730" height="450" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
 
 <p><br /></p>
 
@@ -415,7 +411,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h1 id="part-2-reviews-over-time-via-folium-heatmapwithtime-plugin">Part 2. Reviews over time via <code class="language-plaintext highlighter-rouge">folium HeatMapWithTime</code> plugin</h1>
+<h1 id="part-2-reviews-via-folium-heatmapwithtime-plugin">Part 2. Reviews via <code class="language-plaintext highlighter-rouge">folium HeatMapWithTime</code> plugin</h1>
 
 <h2 id="data-processing">Data processing</h2>
 
