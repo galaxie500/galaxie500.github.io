@@ -57,7 +57,7 @@
  <title>Brian Hu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-11T19:01:38+00:00</updated>
+ <updated>2021-08-11T20:25:19+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -74,7 +74,7 @@
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
 
-&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;800&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;740&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
