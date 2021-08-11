@@ -8,17 +8,17 @@
 <meta property="og:title" content="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" />
 <meta name="author" content="Brian Hu" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="What is a coordinate descent compared to gradient descent? How to solve it?" />
-<meta property="og:description" content="What is a coordinate descent compared to gradient descent? How to solve it?" />
-<link rel="canonical" href="https://galaxie500.github.io/2021/08/11/airbnb.html" />
-<meta property="og:url" content="https://galaxie500.github.io/2021/08/11/airbnb.html" />
+<meta name="description" content="Maybe you’re familar with a heatmap, what about adding timestamp on it?" />
+<meta property="og:description" content="Maybe you’re familar with a heatmap, what about adding timestamp on it?" />
+<link rel="canonical" href="https://galaxie500.github.io/2021/08/11/airbnb-timeserie-eda.html" />
+<meta property="og:url" content="https://galaxie500.github.io/2021/08/11/airbnb-timeserie-eda.html" />
 <meta property="og:site_name" content="brianHu" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-08-11T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" />
 <script type="application/ld+json">
-{"description":"What is a coordinate descent compared to gradient descent? How to solve it?","@type":"BlogPosting","headline":"Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime","dateModified":"2021-08-11T00:00:00+00:00","datePublished":"2021-08-11T00:00:00+00:00","url":"https://galaxie500.github.io/2021/08/11/airbnb.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2021/08/11/airbnb.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
+{"description":"Maybe you’re familar with a heatmap, what about adding timestamp on it?","@type":"BlogPosting","headline":"Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime","dateModified":"2021-08-11T00:00:00+00:00","datePublished":"2021-08-11T00:00:00+00:00","url":"https://galaxie500.github.io/2021/08/11/airbnb-timeserie-eda.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2021/08/11/airbnb-timeserie-eda.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
@@ -94,7 +94,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   <div class="post-date">Published on 11 Aug 2021</div>
   
   <noscript>
-    <div class="post-description">What is a coordinate descent compared to gradient descent? How to solve it?</div>
+    <div class="post-description">Maybe you're familar with a heatmap, what about adding timestamp on it?</div>
   </noscript>
   <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
@@ -102,7 +102,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p>This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.</p>
 
-<iframe src="https://airbnb-map.netlify.app" width="725" height="475"></iframe>
+<iframe src="https://airbnb-map.netlify.app" width="735" height="475"></iframe>
 
 <p><br /></p>
 
@@ -396,7 +396,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p>output:</p>
 
-<iframe width="730" height="450" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
+<iframe width="735" height="450" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
 
 <p><br /></p>
 
@@ -837,7 +837,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 </span></code></pre></div></div>
 <p>output:</p>
 
-<iframe src="https://airbnb-map.netlify.app" width="725" height="475"></iframe>
+<iframe src="https://airbnb-map.netlify.app" width="735" height="475"></iframe>
 
 <p><br /></p>
 
@@ -858,8 +858,8 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 <div id="disqus_thread"></div>
 <script>
  var disqus_config = function () {
-     this.page.url = 'https://galaxie500.github.io/2021/08/11/airbnb.html';
-     this.page.identifier = '/2021/08/11/airbnb';
+     this.page.url = 'https://galaxie500.github.io/2021/08/11/airbnb-timeserie-eda.html';
+     this.page.identifier = '/2021/08/11/airbnb-timeserie-eda';
      this.page.title = 'Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime';
  };
 
@@ -885,14 +885,6 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
     
       <li>
         <h3>
-          <a href="/2021/08/10/airbnb-timeserie-eda.html">
-            Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
           <a href="/2021/07/03/word_embeddings.html">
             Building a "no sweat" Word Embeddings
           </a>
@@ -907,6 +899,14 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
         </h3>
       </li>
     
+      <li>
+        <h3>
+          <a href="/2021/05/09/calibrated_estimation.html">
+            Stretching out Support Vector Machine with Calibrated Estimation
+          </a>
+        </h3>
+      </li>
+    
   </ul>
 </div>
 
@@ -915,7 +915,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
   
   <h2>all tags</h2>
-  <div class="tag-cloud"><a href="/tag/eda/" class="set-2">EDA</a> <a href="/tag/data-visulization/" class="set-2">data-visulization</a> <a href="/tag/folium/" class="set-2">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-5">ml</a> <a href="/tag/nlp/" class="set-4">nlp</a> <a href="/tag/pandas/" class="set-2">pandas</a> <a href="/tag/plotly/" class="set-2">plotly</a> <a href="/tag/time-series/" class="set-2">time-series</a> <a href="/tag/tutorial/" class="set-3">tutorial</a></div>
+  <div class="tag-cloud"><a href="/tag/eda/" class="set-1">EDA</a> <a href="/tag/data-visulization/" class="set-1">data-visulization</a> <a href="/tag/folium/" class="set-1">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-5">ml</a> <a href="/tag/nlp/" class="set-4">nlp</a> <a href="/tag/pandas/" class="set-1">pandas</a> <a href="/tag/plotly/" class="set-1">plotly</a> <a href="/tag/time-series/" class="set-1">time-series</a> <a href="/tag/tutorial/" class="set-2">tutorial</a></div>
   
 
 
@@ -923,7 +923,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <script>
   let i = 0;
-  const text = 'What is a coordinate descent compared to gradient descent? How to solve it?';
+  const text = 'Maybe you're familar with a heatmap, what about adding timestamp on it?';
   const speed = parseInt('50');
   
   function typeWriter() {
