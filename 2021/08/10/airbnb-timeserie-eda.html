@@ -100,7 +100,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   
   <p><br /></p>
 
-<h2 id="introduction">Introduction</h2>
+<h1 id="introduction">Introduction</h1>
 
 <p>This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.</p>
 
@@ -108,11 +108,11 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h2 id="data">Data</h2>
+<h1 id="data">Data</h1>
 
 <p>The dataset was downloaded from <a href="http://insideairbnb.com/get-the-data.html">InsideAirbnb-Hawaii-data</a>, the analysis results were based on a span of two year from July, 2019 to July, 2021.</p>
 
-<h2 id="prerequisite">Prerequisite</h2>
+<h1 id="prerequisite">Prerequisite</h1>
 
 <p>In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install <code class="language-plaintext highlighter-rouge">plotly</code>, <code class="language-plaintext highlighter-rouge">folium</code>, <code class="language-plaintext highlighter-rouge">chart-studio</code>, those can be easily installed via pip under conda environment:</p>
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>plotly
@@ -122,11 +122,11 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h2 id="part-1-visualizing-with-matplotlib-and-plotly">Part 1. Visualizing with <code class="language-plaintext highlighter-rouge">matplotlib</code> and <code class="language-plaintext highlighter-rouge">plotly</code></h2>
+<h1 id="part-1-visualizing-with-matplotlib-and-plotly">Part 1. Visualizing with <code class="language-plaintext highlighter-rouge">matplotlib</code> and <code class="language-plaintext highlighter-rouge">plotly</code></h1>
 
 <p><br /></p>
 
-<h3 id="inspecting-data">Inspecting Data</h3>
+<h2 id="inspecting-data">Inspecting Data</h2>
 
 <p>I will mainly working on <code class="language-plaintext highlighter-rouge">reviews.csv</code> and <code class="language-plaintext highlighter-rouge">listings.csv</code>, merging operations will be included later for visulization.</p>
 
@@ -138,11 +138,11 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h3 id="data-processing--the-number-of-reviews">Data processing:  the number of reviews</h3>
+<h2 id="data-processing--the-number-of-reviews">Data processing:  the number of reviews</h2>
 
 <p>Apparently, there is no obvious feature indicating the fluctuations of Airbnb busineess activity, however, from df_review we can tell that each listing has received multiple comments in various time, with that being said, we can get all the listings that have received any comment on different dates, then <strong>the count of the total comments on each date will be good enough to indicate the change of business activity</strong>. In addition, we can add any metadata associated with listing based on our needs, for instance, we may consider adding geographic features(<code class="language-plaintext highlighter-rouge">neighbourhood</code>,<code class="language-plaintext highlighter-rouge">latitude</code>,<code class="language-plaintext highlighter-rouge">longitude</code>) since we are creating a folium map later, also this kind of feature helps to segragate the data to better examine the change focusing on a particular area.</p>
 
-<h4 id="inspect-the-number-of-reviews-over-time">Inspect the number of reviews over time</h4>
+<h3 id="inspect-the-number-of-reviews-over-time">Inspect the number of reviews over time</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">process_count</span><span class="p">(</span><span class="n">df_review</span><span class="p">,</span> <span class="n">df_listing</span><span class="p">):</span>
     <span class="n">df1</span> <span class="o">=</span> <span class="n">df_review</span><span class="p">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'reviewer_id'</span><span class="p">,</span> <span class="s">'reviewer_name'</span><span class="p">,</span> <span class="s">'comments'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -339,13 +339,13 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 <p>729 rows × 1 columns</p>
 </div>
 
-<h4 id="create-time-variable">Create time variable</h4>
+<h3 id="create-time-variable">Create time variable</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># define time variable
 </span><span class="n">ts</span> <span class="o">=</span> <span class="n">count_per_day_honolulu</span><span class="p">.</span><span class="n">review_count</span>
 </code></pre></div></div>
 
-<h4 id="fit-moving-average">Fit moving average</h4>
+<h3 id="fit-moving-average">Fit moving average</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fit_moving_avg</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="s">"""calculate moving average number of reviews
@@ -358,9 +358,9 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h3 id="visualization">Visualization</h3>
+<h2 id="visualization">Visualization</h2>
 
-<h4 id="via-matplotlib">via matplotlib</h4>
+<h3 id="via-matplotlib">via matplotlib</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plot time variable
 </span><span class="n">ts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'Number of reviews'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'Number of Reviews over time'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
@@ -376,7 +376,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h4 id="insights">Insights</h4>
+<h3 id="insights">Insights</h3>
 <ul>
   <li>This analysis takes the number of reviews per day as an indicator of Airbnb business activity.  It dramaticly decreased after outbreak of COVID-19 in March, 2020.</li>
   <li>The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.</li>
@@ -384,7 +384,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h4 id="interactive-visualization-with-plotly">Interactive visualization with <code class="language-plaintext highlighter-rouge">Plotly</code></h4>
+<h3 id="interactive-visualization-with-plotly">Interactive visualization with <code class="language-plaintext highlighter-rouge">Plotly</code></h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set up for plotly
 </span><span class="n">r</span> <span class="o">=</span> <span class="n">go</span><span class="p">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ts</span><span class="p">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ts</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> 
@@ -415,11 +415,11 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h2 id="part-2-reviews-over-time-via-folium-heatmapwithtime-plugin">Part 2. Reviews over time via <code class="language-plaintext highlighter-rouge">folium HeatMapWithTime</code> plugin</h2>
+<h1 id="part-2-reviews-over-time-via-folium-heatmapwithtime-plugin">Part 2. Reviews over time via <code class="language-plaintext highlighter-rouge">folium HeatMapWithTime</code> plugin</h1>
 
-<h3 id="data-processing">Data processing</h3>
+<h2 id="data-processing">Data processing</h2>
 
-<h4 id="count-reviews-received-for-each-listing-each-month">Count reviews received for each listing each month</h4>
+<h3 id="count-reviews-received-for-each-listing-each-month">Count reviews received for each listing each month</h3>
 
 <p>As you probably already know, <code class="language-plaintext highlighter-rouge">folium</code> creates great interactive maps for visualization, here I am going to create a heat map along with time stamp by using its <code class="language-plaintext highlighter-rouge">HeatMapWithTime</code> plugin, before that there still some processing work need to complete in order to fit our data to the plugin. <a href="https://github.com/python-visualization/folium/blob/master/examples/HeatMapWithTime.ipynb">A simple Demo</a>.</p>
 
@@ -567,7 +567,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h4 id="transform-data-to-the-form-that-folium-can-take">Transform data to the form that <code class="language-plaintext highlighter-rouge">folium</code> can take</h4>
+<h3 id="transform-data-to-the-form-that-folium-can-take">Transform data to the form that <code class="language-plaintext highlighter-rouge">folium</code> can take</h3>
 
 <p>For next step, our dataframe should be looking like below:</p>
 
@@ -828,7 +828,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h3 id="visualization---click-display-button">Visualization - click display button</h3>
+<h2 id="visualization---click-display-button">Visualization - click display button</h2>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create folium object and add timestamp object
 </span><span class="n">time_map</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">([</span><span class="mf">21.3487</span><span class="p">,</span> <span class="o">-</span><span class="mf">157.944</span><span class="p">],</span> <span class="n">zoom_start</span><span class="o">=</span><span class="mf">10.5</span><span class="p">)</span>
@@ -845,7 +845,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <p><br /></p>
 
-<h3 id="insight">Insight</h3>
+<h2 id="insight">Insight</h2>
 
 <ul>
   <li>The heat map above indicates how the number of reviews of Airbnb listings changed on Oahu island during 2019-7 to 2021-7</li>
@@ -919,7 +919,7 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
   
   <h2>all tags</h2>
-  <div class="tag-cloud"><a href="/tag/eda/" class="set-2">EDA</a> <a href="/tag/data-visulization/" class="set-2">data-visulization</a> <a href="/tag/folium/" class="set-2">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-4">ml</a> <a href="/tag/nlp/" class="set-2">nlp</a> <a href="/tag/pandas/" class="set-2">pandas</a> <a href="/tag/plotly/" class="set-2">plotly</a> <a href="/tag/time-series/" class="set-2">time-series</a> <a href="/tag/tutorial/" class="set-4">tutorial</a></div>
+  <div class="tag-cloud"><a href="/tag/eda/" class="set-1">EDA</a> <a href="/tag/data-visulization/" class="set-1">data-visulization</a> <a href="/tag/folium/" class="set-1">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-4">ml</a> <a href="/tag/nlp/" class="set-3">nlp</a> <a href="/tag/pandas/" class="set-1">pandas</a> <a href="/tag/plotly/" class="set-1">plotly</a> <a href="/tag/time-series/" class="set-1">time-series</a> <a href="/tag/tutorial/" class="set-2">tutorial</a></div>
   
 
 

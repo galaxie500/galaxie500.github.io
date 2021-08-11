@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:58:16+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T07:26:18+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
 </subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
 
@@ -9,11 +9,11 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;data&quot;&gt;Data&lt;/h2&gt;
+&lt;h1 id=&quot;data&quot;&gt;Data&lt;/h1&gt;
 
 &lt;p&gt;The dataset was downloaded from &lt;a href=&quot;http://insideairbnb.com/get-the-data.html&quot;&gt;InsideAirbnb-Hawaii-data&lt;/a&gt;, the analysis results were based on a span of two year from July, 2019 to July, 2021.&lt;/p&gt;
 
-&lt;h2 id=&quot;prerequisite&quot;&gt;Prerequisite&lt;/h2&gt;
+&lt;h1 id=&quot;prerequisite&quot;&gt;Prerequisite&lt;/h1&gt;
 
 &lt;p&gt;In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;chart-studio&lt;/code&gt;, those can be easily installed via pip under conda environment:&lt;/p&gt;
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;plotly
@@ -23,11 +23,11 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;part-1-visualizing-with-matplotlib-and-plotly&quot;&gt;Part 1. Visualizing with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matplotlib&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;&lt;/h2&gt;
+&lt;h1 id=&quot;part-1-visualizing-with-matplotlib-and-plotly&quot;&gt;Part 1. Visualizing with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matplotlib&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;&lt;/h1&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;inspecting-data&quot;&gt;Inspecting Data&lt;/h3&gt;
+&lt;h2 id=&quot;inspecting-data&quot;&gt;Inspecting Data&lt;/h2&gt;
 
 &lt;p&gt;I will mainly working on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reviews.csv&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;listings.csv&lt;/code&gt;, merging operations will be included later for visulization.&lt;/p&gt;
 
@@ -39,11 +39,11 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;data-processing--the-number-of-reviews&quot;&gt;Data processing:  the number of reviews&lt;/h3&gt;
+&lt;h2 id=&quot;data-processing--the-number-of-reviews&quot;&gt;Data processing:  the number of reviews&lt;/h2&gt;
 
 &lt;p&gt;Apparently, there is no obvious feature indicating the fluctuations of Airbnb busineess activity, however, from df_review we can tell that each listing has received multiple comments in various time, with that being said, we can get all the listings that have received any comment on different dates, then &lt;strong&gt;the count of the total comments on each date will be good enough to indicate the change of business activity&lt;/strong&gt;. In addition, we can add any metadata associated with listing based on our needs, for instance, we may consider adding geographic features(&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;neighbourhood&lt;/code&gt;,&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;latitude&lt;/code&gt;,&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;longitude&lt;/code&gt;) since we are creating a folium map later, also this kind of feature helps to segragate the data to better examine the change focusing on a particular area.&lt;/p&gt;
 
-&lt;h4 id=&quot;inspect-the-number-of-reviews-over-time&quot;&gt;Inspect the number of reviews over time&lt;/h4&gt;
+&lt;h3 id=&quot;inspect-the-number-of-reviews-over-time&quot;&gt;Inspect the number of reviews over time&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;process_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df_review&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;df_listing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;df1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;df_review&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'reviewer_id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'reviewer_name'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'comments'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -240,13 +240,13 @@
 &lt;p&gt;729 rows × 1 columns&lt;/p&gt;
 &lt;/div&gt;
 
-&lt;h4 id=&quot;create-time-variable&quot;&gt;Create time variable&lt;/h4&gt;
+&lt;h3 id=&quot;create-time-variable&quot;&gt;Create time variable&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# define time variable
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count_per_day_honolulu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;review_count&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h4 id=&quot;fit-moving-average&quot;&gt;Fit moving average&lt;/h4&gt;
+&lt;h3 id=&quot;fit-moving-average&quot;&gt;Fit moving average&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fit_moving_avg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;series&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;window&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;calculate moving average number of reviews
@@ -259,9 +259,9 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;visualization&quot;&gt;Visualization&lt;/h3&gt;
+&lt;h2 id=&quot;visualization&quot;&gt;Visualization&lt;/h2&gt;
 
-&lt;h4 id=&quot;via-matplotlib&quot;&gt;via matplotlib&lt;/h4&gt;
+&lt;h3 id=&quot;via-matplotlib&quot;&gt;via matplotlib&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# plot time variable
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;figsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Number of reviews'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Number of Reviews over time'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fontsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -277,7 +277,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;insights&quot;&gt;Insights&lt;/h4&gt;
+&lt;h3 id=&quot;insights&quot;&gt;Insights&lt;/h3&gt;
 &lt;ul&gt;
   &lt;li&gt;This analysis takes the number of reviews per day as an indicator of Airbnb business activity.  It dramaticly decreased after outbreak of COVID-19 in March, 2020.&lt;/li&gt;
   &lt;li&gt;The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.&lt;/li&gt;
@@ -285,7 +285,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;interactive-visualization-with-plotly&quot;&gt;Interactive visualization with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Plotly&lt;/code&gt;&lt;/h4&gt;
+&lt;h3 id=&quot;interactive-visualization-with-plotly&quot;&gt;Interactive visualization with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Plotly&lt;/code&gt;&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# set up for plotly
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;go&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Scatter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
@@ -316,11 +316,11 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;part-2-reviews-over-time-via-folium-heatmapwithtime-plugin&quot;&gt;Part 2. Reviews over time via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium HeatMapWithTime&lt;/code&gt; plugin&lt;/h2&gt;
+&lt;h1 id=&quot;part-2-reviews-over-time-via-folium-heatmapwithtime-plugin&quot;&gt;Part 2. Reviews over time via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium HeatMapWithTime&lt;/code&gt; plugin&lt;/h1&gt;
 
-&lt;h3 id=&quot;data-processing&quot;&gt;Data processing&lt;/h3&gt;
+&lt;h2 id=&quot;data-processing&quot;&gt;Data processing&lt;/h2&gt;
 
-&lt;h4 id=&quot;count-reviews-received-for-each-listing-each-month&quot;&gt;Count reviews received for each listing each month&lt;/h4&gt;
+&lt;h3 id=&quot;count-reviews-received-for-each-listing-each-month&quot;&gt;Count reviews received for each listing each month&lt;/h3&gt;
 
 &lt;p&gt;As you probably already know, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; creates great interactive maps for visualization, here I am going to create a heat map along with time stamp by using its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HeatMapWithTime&lt;/code&gt; plugin, before that there still some processing work need to complete in order to fit our data to the plugin. &lt;a href=&quot;https://github.com/python-visualization/folium/blob/master/examples/HeatMapWithTime.ipynb&quot;&gt;A simple Demo&lt;/a&gt;.&lt;/p&gt;
 
@@ -468,7 +468,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;transform-data-to-the-form-that-folium-can-take&quot;&gt;Transform data to the form that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; can take&lt;/h4&gt;
+&lt;h3 id=&quot;transform-data-to-the-form-that-folium-can-take&quot;&gt;Transform data to the form that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; can take&lt;/h3&gt;
 
 &lt;p&gt;For next step, our dataframe should be looking like below:&lt;/p&gt;
 
@@ -729,7 +729,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;visualization---click-display-button&quot;&gt;Visualization - click display button&lt;/h3&gt;
+&lt;h2 id=&quot;visualization---click-display-button&quot;&gt;Visualization - click display button&lt;/h2&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# create folium object and add timestamp object
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time_map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;folium&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;21.3487&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;157.944&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zoom_start&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;10.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -746,7 +746,7 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;insight&quot;&gt;Insight&lt;/h3&gt;
+&lt;h2 id=&quot;insight&quot;&gt;Insight&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;The heat map above indicates how the number of reviews of Airbnb listings changed on Oahu island during 2019-7 to 2021-7&lt;/li&gt;
@@ -3229,7 +3229,7 @@ To learn the monotonic transform:&lt;/p&gt;
 &lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name>Brian Hu</name></author><category term="introduction" /><category term="tutorial" /><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin</title><link href="https://galaxie500.github.io/2019/04/16/airbnb-timeseries.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin" /><published>2019-04-16T00:00:00+00:00</published><updated>2019-04-16T00:00:00+00:00</updated><id>https://galaxie500.github.io/2019/04/16/airbnb-timeseries</id><content type="html" xml:base="https://galaxie500.github.io/2019/04/16/airbnb-timeseries.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name>Brian Hu</name></author><category term="introduction" /><category term="tutorial" /><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry><entry><title type="html">welcome to jekyll</title><link href="https://galaxie500.github.io/2019/04/16/airbnb-timeseries.html" rel="alternate" type="text/html" title="welcome to jekyll" /><published>2019-04-16T00:00:00+00:00</published><updated>2019-04-16T00:00:00+00:00</updated><id>https://galaxie500.github.io/2019/04/16/airbnb-timeseries</id><content type="html" xml:base="https://galaxie500.github.io/2019/04/16/airbnb-timeseries.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curve will be looking like, however, I thought this would be interesting to practice both data processing and data visulization when timeseries attribute involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization helps.&lt;/p&gt;
 
@@ -3273,4 +3273,4 @@ To learn the monotonic transform:&lt;/p&gt;
 &lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
 
 &lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;&lt;a href=&quot;https://twitter.com/hashtag/jekyll?src=hash&amp;amp;ref_src=twsrc%5Etfw&quot;&gt;#jekyll&lt;/a&gt; &lt;a href=&quot;https://twitter.com/hashtag/dash?src=hash&amp;amp;ref_src=twsrc%5Etfw&quot;&gt;#dash&lt;/a&gt; now officially supports both, dark and light theming. Enjoy!&lt;a href=&quot;https://t.co/4evp9pX2Ws&quot;&gt;https://t.co/4evp9pX2Ws&lt;/a&gt; &lt;a href=&quot;https://t.co/vOQCZjGKic&quot;&gt;pic.twitter.com/vOQCZjGKic&lt;/a&gt;&lt;/p&gt;&amp;mdash; 〽️ɪɢᴜᴇʟ (@bitbrain_) &lt;a href=&quot;https://twitter.com/bitbrain_/status/1166440978124877827?ref_src=twsrc%5Etfw&quot;&gt;August 27, 2019&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async=&quot;&quot; src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;</content><author><name>Brian Hu</name></author><category term="EDA" /><category term="data-visulization" /><category term="tutorial" /><category term="time-series" /><category term="pandas" /><category term="folium" /><category term="plotly" /><summary type="html">Introduction</summary></entry></feed>
+&lt;script async=&quot;&quot; src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;</content><author><name>Brian Hu</name></author><category term="ml" /><category term="nlp" /><category term="introduction" /><summary type="html">Introduction</summary></entry></feed>
