@@ -57,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-11T02:40:18+00:00</updated>
+ <updated>2021-08-11T02:47:16+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -70,7 +70,9 @@
    <link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html"/>
    <updated>2021-08-10T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id>
-   <content type="html">&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;700&quot; height=&quot;600&quot;&gt;&lt;/iframe&gt;
+   <content type="html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;700&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -347,14 +349,9 @@
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;insights&quot;&gt;Insights&lt;/h4&gt;
-
 &lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;This analysis takes the number of reviews per day as an indicator of Airbnb business activity.  It dramaticly decreased after outbreak of COVID-19 in March, 2020.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;This analysis takes the number of reviews per day as an indicator of Airbnb business activity.  It dramaticly decreased after outbreak of COVID-19 in March, 2020.&lt;/li&gt;
+  &lt;li&gt;The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
@@ -375,7 +372,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;iframe width=&quot;775&quot; height=&quot;500&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
+&lt;iframe width=&quot;700&quot; height=&quot;450&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
@@ -385,7 +382,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;iframe width=&quot;775&quot; height=&quot;500&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/4.embed&quot;&gt;&lt;/iframe&gt;
+&lt;iframe width=&quot;700&quot; height=&quot;450&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/4.embed&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;Use following snippet to push the plotly object to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly express&lt;/code&gt;, which generates embedding information for hosting the interactive image on web pages.&lt;/p&gt;
 
