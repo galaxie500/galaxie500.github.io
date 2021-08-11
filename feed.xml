@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:47:16+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:58:16+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
 </subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;700&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
+
+&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;725&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;data&quot;&gt;Data&lt;/h2&gt;
 
@@ -305,22 +305,13 @@
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h4 id=&quot;add-a-rangeselector&quot;&gt;Add a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rangeselector&lt;/code&gt;&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://gist.github.com/galaxie500/a45e67f59691ddd482956e708a53863e&quot;&gt;rangeSelector&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;output:&lt;/p&gt;
-
-&lt;iframe width=&quot;700&quot; height=&quot;450&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/4.embed&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;Use following snippet to push the plotly object to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly express&lt;/code&gt;, which generates embedding information for hosting the interactive image on web pages.&lt;/p&gt;
+&lt;p&gt;Following snippet is used to push the plotly object to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly express&lt;/code&gt;, which generates embedding information for hosting the interactive image on web pages.&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;username&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# your username
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# your api key for plotly express - go to profile &amp;gt; settings &amp;gt; regenerate key
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chart_studio&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tools&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_credentials_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;username&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;username&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;api_key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 
 &lt;span class=&quot;n&quot;&gt;py&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fig1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'review_over_time'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;auto_open&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;py&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fig2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'review_over_time'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;auto_open&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
@@ -331,7 +322,7 @@
 
 &lt;h4 id=&quot;count-reviews-received-for-each-listing-each-month&quot;&gt;Count reviews received for each listing each month&lt;/h4&gt;
 
-&lt;p&gt;As you probably already know, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; creates great interactive maps for visualization, here I am going to create a heat map along with time stamp by using its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HeatMapWithTime&lt;/code&gt; plugin, before that there still some processing work need to complete in order to fit our data to the plugin. &lt;a href=&quot;https://github.com/python-visualization/folium/blob/master/examples/HeatMapWithTime.ipynb&quot;&gt;Demo&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As you probably already know, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; creates great interactive maps for visualization, here I am going to create a heat map along with time stamp by using its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HeatMapWithTime&lt;/code&gt; plugin, before that there still some processing work need to complete in order to fit our data to the plugin. &lt;a href=&quot;https://github.com/python-visualization/folium/blob/master/examples/HeatMapWithTime.ipynb&quot;&gt;A simple Demo&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;First, count how many reviews each listing received each day, then change the time range to Month, that is to record how many reviews each listing received each month. The reason that change time range from day to month is we don’t want the final display moving too frequently so that we can clearly spot the moving trend.&lt;/p&gt;
 
@@ -749,6 +740,9 @@
 #time_map
 #time_map.save(&quot;index.html&quot;)
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;output:&lt;/p&gt;
+
+&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;725&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
