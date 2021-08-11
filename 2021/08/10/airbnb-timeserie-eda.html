@@ -26,6 +26,10 @@
   <script src="/assets/js/jquery.magnific-popup.js"></script>
   <!--mathJax-->
   
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  
 </head>
 <body><div class="site-header">
   <div class="wrapper">
@@ -94,7 +98,9 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
   </noscript>
   <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
-  <h2 id="introduction">Introduction</h2>
+  <p><br /></p>
+
+<h2 id="introduction">Introduction</h2>
 
 <p>This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.</p>
 
@@ -104,53 +110,17 @@ Current Master of Data Science Candidate @ Univ of California San Diego, Data En
 
 <h2 id="prerequisite">Prerequisite</h2>
 
-<p>In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install <code class="language-plaintext highlighter-rouge">plotly</code>, <code class="language-plaintext highlighter-rouge">folium</code>, <code class="language-plaintext highlighter-rouge">chart-studio</code>, those can be easily installed via pip under conda environment:
-~~~sh
-$ pip install plotly
-$ pip install folium
-$ pip install chart-studio</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
-<span class="c1">#import boto3
-</span>
-<span class="kn">import</span> <span class="nn">folium</span>
-<span class="kn">from</span> <span class="nn">folium</span> <span class="kn">import</span> <span class="n">plugins</span>
-<span class="kn">from</span> <span class="nn">folium.plugins</span> <span class="kn">import</span> <span class="n">HeatMap</span>
-<span class="kn">from</span> <span class="nn">folium.plugins</span> <span class="kn">import</span> <span class="n">HeatMapWithTime</span>
-<span class="kn">from</span> <span class="nn">folium.plugins</span> <span class="kn">import</span> <span class="n">FastMarkerCluster</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">chart_studio</span>
-<span class="kn">import</span> <span class="nn">chart_studio.plotly</span> <span class="k">as</span> <span class="n">py</span>
-<span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="n">go</span>
-
-<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="kn">import</span> <span class="n">init_notebook_mode</span><span class="p">,</span> <span class="n">iplot</span>
-<span class="n">init_notebook_mode</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-
-<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="n">use</span><span class="p">(</span><span class="s">'seaborn-whitegrid'</span><span class="p">)</span>
+<p>In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install <code class="language-plaintext highlighter-rouge">plotly</code>, <code class="language-plaintext highlighter-rouge">folium</code>, <code class="language-plaintext highlighter-rouge">chart-studio</code>, those can be easily installed via pip under conda environment:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>plotly
+<span class="nv">$ </span>pip <span class="nb">install </span>folium
+<span class="nv">$ </span>pip <span class="nb">install </span>chart-studio
 </code></pre></div></div>
 
-<script type="text/javascript">
-window.PlotlyConfig = {MathJaxConfig: 'local'};
-if (window.MathJax) {MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
-if (typeof require !== 'undefined') {
-require.undef("plotly");
-requirejs.config({
-    paths: {
-        'plotly': ['https://cdn.plot.ly/plotly-2.2.0.min']
-    }
-});
-require(['plotly'], function(Plotly) {
-    window._Plotly = Plotly;
-});
-}
-</script>
+<p><br /></p>
 
 <h2 id="part-1-visualizing-with-matplotlib-and-plotly">Part 1. Visualizing with <code class="language-plaintext highlighter-rouge">matplotlib</code> and <code class="language-plaintext highlighter-rouge">plotly</code></h2>
+
+<p><br /></p>
 
 <h3 id="inspecting-data">Inspecting Data</h3>
 
@@ -160,216 +130,9 @@ require(['plotly'], function(Plotly) {
 <span class="n">df_listing</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'listings.csv'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_listing</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre></div></div>
-
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>listing_url</th>
-      <th>scrape_id</th>
-      <th>last_scraped</th>
-      <th>name</th>
-      <th>description</th>
-      <th>neighborhood_overview</th>
-      <th>picture_url</th>
-      <th>host_id</th>
-      <th>host_url</th>
-      <th>...</th>
-      <th>review_scores_communication</th>
-      <th>review_scores_location</th>
-      <th>review_scores_value</th>
-      <th>license</th>
-      <th>instant_bookable</th>
-      <th>calculated_host_listings_count</th>
-      <th>calculated_host_listings_count_entire_homes</th>
-      <th>calculated_host_listings_count_private_rooms</th>
-      <th>calculated_host_listings_count_shared_rooms</th>
-      <th>reviews_per_month</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>5065</td>
-      <td>https://www.airbnb.com/rooms/5065</td>
-      <td>20210708132536</td>
-      <td>2021-07-09</td>
-      <td>MAUKA BB</td>
-      <td>Perfect for your vacation, Staycation or just ...</td>
-      <td>Neighbors here are friendly but are not really...</td>
-      <td>https://a0.muscache.com/pictures/36718112/1f0e...</td>
-      <td>7257</td>
-      <td>https://www.airbnb.com/users/show/7257</td>
-      <td>...</td>
-      <td>4.71</td>
-      <td>4.48</td>
-      <td>4.76</td>
-      <td>NaN</td>
-      <td>f</td>
-      <td>1</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0.41</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>5269</td>
-      <td>https://www.airbnb.com/rooms/5269</td>
-      <td>20210708132536</td>
-      <td>2021-07-09</td>
-      <td>Upcountry Hospitality in the 'Auwai Suite</td>
-      <td>The 'Auwai Suite is a lovely, self-contained a...</td>
-      <td>We are located on the "sunny side" of Waimea, ...</td>
-      <td>https://a0.muscache.com/pictures/5b52b72f-5a09...</td>
-      <td>7620</td>
-      <td>https://www.airbnb.com/users/show/7620</td>
-      <td>...</td>
-      <td>4.91</td>
-      <td>5.00</td>
-      <td>4.82</td>
-      <td>119-269-5808-01R</td>
-      <td>f</td>
-      <td>3</td>
-      <td>3</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0.10</td>
-    </tr>
-  </tbody>
-</table>
-<p>2 rows × 74 columns</p>
-</div>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_listing</span><span class="p">.</span><span class="n">columns</span>
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Index(['id', 'listing_url', 'scrape_id', 'last_scraped', 'name', 'description',
-       'neighborhood_overview', 'picture_url', 'host_id', 'host_url',
-       'host_name', 'host_since', 'host_location', 'host_about',
-       'host_response_time', 'host_response_rate', 'host_acceptance_rate',
-       'host_is_superhost', 'host_thumbnail_url', 'host_picture_url',
-       'host_neighbourhood', 'host_listings_count',
-       'host_total_listings_count', 'host_verifications',
-       'host_has_profile_pic', 'host_identity_verified', 'neighbourhood',
-       'neighbourhood_cleansed', 'neighbourhood_group_cleansed', 'latitude',
-       'longitude', 'property_type', 'room_type', 'accommodates', 'bathrooms',
-       'bathrooms_text', 'bedrooms', 'beds', 'amenities', 'price',
-       'minimum_nights', 'maximum_nights', 'minimum_minimum_nights',
-       'maximum_minimum_nights', 'minimum_maximum_nights',
-       'maximum_maximum_nights', 'minimum_nights_avg_ntm',
-       'maximum_nights_avg_ntm', 'calendar_updated', 'has_availability',
-       'availability_30', 'availability_60', 'availability_90',
-       'availability_365', 'calendar_last_scraped', 'number_of_reviews',
-       'number_of_reviews_ltm', 'number_of_reviews_l30d', 'first_review',
-       'last_review', 'review_scores_rating', 'review_scores_accuracy',
-       'review_scores_cleanliness', 'review_scores_checkin',
-       'review_scores_communication', 'review_scores_location',
-       'review_scores_value', 'license', 'instant_bookable',
-       'calculated_host_listings_count',
-       'calculated_host_listings_count_entire_homes',
-       'calculated_host_listings_count_private_rooms',
-       'calculated_host_listings_count_shared_rooms', 'reviews_per_month'],
-      dtype='object')
-</code></pre></div></div>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_review</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
-
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>listing_id</th>
-      <th>id</th>
-      <th>date</th>
-      <th>reviewer_id</th>
-      <th>reviewer_name</th>
-      <th>comments</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>5065</td>
-      <td>3578629</td>
-      <td>2013-02-18</td>
-      <td>4574728</td>
-      <td>Terry</td>
-      <td>The place was difficult to find and communicat...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>5065</td>
-      <td>4412184</td>
-      <td>2013-05-03</td>
-      <td>3067352</td>
-      <td>Olivia</td>
-      <td>Wayne was very friendly and his place is sweet...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>5065</td>
-      <td>55331648</td>
-      <td>2015-11-29</td>
-      <td>33781202</td>
-      <td>Elspeth And Adam Dobres</td>
-      <td>We loved our time at this BnB! Beautiful surro...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>5065</td>
-      <td>57598810</td>
-      <td>2015-12-27</td>
-      <td>12288841</td>
-      <td>Lydia</td>
-      <td>The organisation was very uncomplicated,\r&lt;br/...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5065</td>
-      <td>58905911</td>
-      <td>2016-01-05</td>
-      <td>41538214</td>
-      <td>Andrew</td>
-      <td>Place was great for what we wanted. Be ready t...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
 <p>df_listing contains all the metadata for all the listings and df_review has all the review information for each review associated with its list id. Noticed <code class="language-plaintext highlighter-rouge">listing_id</code> in df_review is <code class="language-plaintext highlighter-rouge">id</code> in df_listing, it will be the key for our merging.</p>
+
+<p><br /></p>
 
 <h3 id="data-processing--the-number-of-reviews">Data processing:  the number of reviews</h3>
 
@@ -392,6 +155,8 @@ require(['plotly'], function(Plotly) {
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">listing_reveived_review</span> <span class="o">=</span> <span class="n">process_count</span><span class="p">(</span><span class="n">df_review</span><span class="p">,</span> <span class="n">df_listing</span><span class="p">)</span>
 <span class="n">listing_reveived_review</span>
 </code></pre></div></div>
+
+<p>output:</p>
 
 <div>
 <style scoped="">
@@ -493,6 +258,8 @@ require(['plotly'], function(Plotly) {
 <span class="n">count_per_day_honolulu</span>
 </code></pre></div></div>
 
+<p>output:</p>
+
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -585,7 +352,7 @@ require(['plotly'], function(Plotly) {
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg_ts</span> <span class="o">=</span> <span class="n">fit_moving_avg</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Before visualizing</p>
+<p><br /></p>
 
 <h3 id="visualization">Visualization</h3>
 
@@ -595,13 +362,17 @@ require(['plotly'], function(Plotly) {
 </span><span class="n">ts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'Number of reviews'</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'Number of Reviews over time'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
 <span class="c1"># plot moving average
 </span><span class="n">avg_ts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">'Average number of reviews'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="c1">#plt.savefig('moving_avg.png')
 </span></code></pre></div></div>
 
-<p><img src="output_29_0.png" alt="png" /></p>
+<p>output:</p>
 
-<p>Insights</p>
+<p><img src="/assets/images/coordinate_descent.png" /></p>
+
+<p><br /></p>
+
+<h4 id="insights">Insights</h4>
 
 <ul>
   <li>
@@ -611,6 +382,8 @@ require(['plotly'], function(Plotly) {
     <p>The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.</p>
   </li>
 </ul>
+
+<p><br /></p>
 
 <h4 id="interactive-visualization-with-plotly">Interactive visualization with <code class="language-plaintext highlighter-rouge">Plotly</code></h4>
 
@@ -628,7 +401,9 @@ require(['plotly'], function(Plotly) {
 
 <p>output:</p>
 
-<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
+<iframe width="775" height="500" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/2.embed"></iframe>
+
+<p><br /></p>
 
 <h4 id="add-a-rangeselector">Add a <code class="language-plaintext highlighter-rouge">rangeselector</code></h4>
 
@@ -679,7 +454,7 @@ require(['plotly'], function(Plotly) {
 
 <p>output:</p>
 
-<iframe width="900" height="800" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/4.embed"></iframe>
+<iframe width="775" height="500" frameborder="0" scrolling="no" src="//plotly.com/~huyuan17/4.embed"></iframe>
 
 <p>Here I will include the code that pushes the plot oject to <code class="language-plaintext highlighter-rouge">plotly express</code>, which generates embedding information for hosting the interactive image on web pages.</p>
 
@@ -691,18 +466,13 @@ require(['plotly'], function(Plotly) {
 <span class="n">py</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig2</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="s">'review_over_time'</span><span class="p">,</span> <span class="n">auto_open</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'https://plotly.com/~huyuan17/2/'
-</code></pre></div></div>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">py</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fig2</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="s">'review_over_time_rangeselector'</span><span class="p">,</span> <span class="n">auto_open</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'https://plotly.com/~huyuan17/4/'
-</code></pre></div></div>
+<p><br /></p>
 
 <h2 id="part-2-reviews-over-time-via-folium">Part 2. Reviews over time via <code class="language-plaintext highlighter-rouge">folium</code></h2>
 
-<h3 id="data-processing">Data processing:</h3>
+<p><br /></p>
+
+<h3 id="data-processing">Data processing</h3>
 
 <h4 id="count-reviews-received-for-each-listing-each-month">Count reviews received for each listing each month</h4>
 
@@ -847,6 +617,8 @@ require(['plotly'], function(Plotly) {
 </table>
 <p>116724 rows × 5 columns</p>
 </div>
+
+<p><br /></p>
 
 <h4 id="transform-data-to-the-form-that-folium-can-take">Transform data to the form that <code class="language-plaintext highlighter-rouge">folium</code> can take</h4>
 
@@ -1078,6 +850,8 @@ require(['plotly'], function(Plotly) {
 </table>
 </div>
 
+<p><br /></p>
+
 <p>Lastly, we just extract the repective <code class="language-plaintext highlighter-rouge">latitude</code>, <code class="language-plaintext highlighter-rouge">longitude</code>, and <code class="language-plaintext highlighter-rouge">review_count</code> to a final form for pass in to the plugin.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># transform data for folium
@@ -1105,6 +879,8 @@ require(['plotly'], function(Plotly) {
                       <span class="n">generate_location_points</span><span class="p">(</span><span class="n">listings_with_total_review_count</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre></div></div>
 
+<p><br /></p>
+
 <h3 id="visualization---click-display-button">Visualization - click display button</h3>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create folium object and add timestamp object
@@ -1116,6 +892,8 @@ require(['plotly'], function(Plotly) {
 #time_map
 #time_map.save("index.html")
 </span></code></pre></div></div>
+
+<p><br /></p>
 
 <h3 id="insight">Insight</h3>
 
