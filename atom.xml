@@ -3,31 +3,31 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>brianHu | Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.</title>
+<title>Brian Hu | Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, Email: huyuan17@gmail.com</title>
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="brianHu" />
+<meta property="og:title" content="Brian Hu" />
 <meta name="author" content="Brian Hu" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics." />
-<meta property="og:description" content="Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics." />
+<meta name="description" content="Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, Email: huyuan17@gmail.com" />
+<meta property="og:description" content="Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, Email: huyuan17@gmail.com" />
 <link rel="canonical" href="https://galaxie500.github.io/atom.xml" />
 <meta property="og:url" content="https://galaxie500.github.io/atom.xml" />
-<meta property="og:site_name" content="brianHu" />
+<meta property="og:site_name" content="Brian Hu" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="brianHu" />
+<meta property="twitter:title" content="Brian Hu" />
 <script type="application/ld+json">
-{"description":"Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.","@type":"WebPage","headline":"brianHu","url":"https://galaxie500.github.io/atom.xml","author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
+{"description":"Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, Email: huyuan17@gmail.com","@type":"WebPage","headline":"Brian Hu","url":"https://galaxie500.github.io/atom.xml","author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
-  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="brianHu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
+  <link rel="stylesheet" href="/assets/css/magnific-popup.css"><link type="application/atom+xml" rel="alternate" href="https://galaxie500.github.io/feed.xml" title="Brian Hu" /><script src="https://code.jquery.com/jquery-3.2.0.min.js"></script> 
   <script src="/assets/js/jquery.magnific-popup.js"></script>
   <!--mathJax-->
   
 </head>
 <body><div class="site-header">
   <div class="wrapper">
-    <a class="site-title" rel="author" href="/">brianHu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <a class="site-title" rel="author" href="/">Brian Hu<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
     <span class="social_links">
         
         
@@ -54,10 +54,10 @@
         <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
- <title>brianHu</title>
+ <title>Brian Hu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-11T09:43:47+00:00</updated>
+ <updated>2021-08-11T19:01:38+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -74,7 +74,7 @@
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
 
-&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;735&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;https://airbnb-map.netlify.app&quot; width=&quot;800&quot; height=&quot;475&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
