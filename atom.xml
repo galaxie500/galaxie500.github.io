@@ -57,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-11T09:17:33+00:00</updated>
+ <updated>2021-08-11T09:21:51+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -539,7 +539,7 @@
 
 &lt;p&gt;For next step, our dataframe should be looking like below:&lt;/p&gt;
 
-&lt;table&gt;
+&lt;table border=&quot;1&quot;&gt;
 &lt;thead&gt;
   &lt;tr&gt;
     &lt;th&gt;time-index&lt;/th&gt;
