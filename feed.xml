@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:01:16+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
-</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:01:31+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This artile will walk through visualizing the fluctuations of Airbnb busineess affected by COVID-19 pandemic. Intuitively, we might have a rough guess what the curves will be looking like, however, I thought this would be interesting to practice both data processing and visulization when time-series attributes involved, what’s more important, to better explore the data and express the insight to a wide variety of audience in a more approachable manner, an interactive visulization significantly helps.&lt;/p&gt;
 
@@ -11,17 +9,53 @@
 
 &lt;h2 id=&quot;prerequisite&quot;&gt;Prerequisite&lt;/h2&gt;
 
-&lt;p&gt;In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;chart-studio&lt;/code&gt;, those can be easily installed via pip under conda environment:&lt;/p&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;plotly
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;folium
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;chart-studio
+&lt;p&gt;In addition to commonly used python data science packages(numpy, pandas, matplotlib, seaborn), here we also need install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;chart-studio&lt;/code&gt;, those can be easily installed via pip under conda environment:
+~~~sh
+$ pip install plotly
+$ pip install folium
+$ pip install chart-studio&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pandas&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;seaborn&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sns&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#import boto3
+&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;folium&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;folium&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;plugins&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;folium.plugins&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HeatMap&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;folium.plugins&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HeatMapWithTime&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;folium.plugins&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FastMarkerCluster&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pandas&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;chart_studio&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;chart_studio.plotly&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;py&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;plotly.graph_objs&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;go&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;plotly.offline&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;init_notebook_mode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iplot&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;init_notebook_mode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connected&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matplotlib&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inline&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;use&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'seaborn-whitegrid'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+window.PlotlyConfig = {MathJaxConfig: 'local'};
+if (window.MathJax) {MathJax.Hub.Config({SVG: {font: &quot;STIX-Web&quot;}});}
+if (typeof require !== 'undefined') {
+require.undef(&quot;plotly&quot;);
+requirejs.config({
+    paths: {
+        'plotly': ['https://cdn.plot.ly/plotly-2.2.0.min']
+    }
+});
+require(['plotly'], function(Plotly) {
+    window._Plotly = Plotly;
+});
+}
+&lt;/script&gt;
 
 &lt;h2 id=&quot;part-1-visualizing-with-matplotlib-and-plotly&quot;&gt;Part 1. Visualizing with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matplotlib&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly&lt;/code&gt;&lt;/h2&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;inspecting-data&quot;&gt;Inspecting Data&lt;/h3&gt;
 
@@ -31,9 +65,216 @@
 &lt;span class=&quot;n&quot;&gt;df_listing&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read_csv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'listings.csv'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;df_listing contains all the metadata for all the listings and df_review has all the review information for each review associated with its list id. Noticed &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;listing_id&lt;/code&gt; in df_review is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;id&lt;/code&gt; in df_listing, it will be the key for our merging.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;df_listing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;div&gt;
+&lt;style scoped=&quot;&quot;&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&quot;1&quot; class=&quot;dataframe&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&quot;text-align: right;&quot;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;listing_url&lt;/th&gt;
+      &lt;th&gt;scrape_id&lt;/th&gt;
+      &lt;th&gt;last_scraped&lt;/th&gt;
+      &lt;th&gt;name&lt;/th&gt;
+      &lt;th&gt;description&lt;/th&gt;
+      &lt;th&gt;neighborhood_overview&lt;/th&gt;
+      &lt;th&gt;picture_url&lt;/th&gt;
+      &lt;th&gt;host_id&lt;/th&gt;
+      &lt;th&gt;host_url&lt;/th&gt;
+      &lt;th&gt;...&lt;/th&gt;
+      &lt;th&gt;review_scores_communication&lt;/th&gt;
+      &lt;th&gt;review_scores_location&lt;/th&gt;
+      &lt;th&gt;review_scores_value&lt;/th&gt;
+      &lt;th&gt;license&lt;/th&gt;
+      &lt;th&gt;instant_bookable&lt;/th&gt;
+      &lt;th&gt;calculated_host_listings_count&lt;/th&gt;
+      &lt;th&gt;calculated_host_listings_count_entire_homes&lt;/th&gt;
+      &lt;th&gt;calculated_host_listings_count_private_rooms&lt;/th&gt;
+      &lt;th&gt;calculated_host_listings_count_shared_rooms&lt;/th&gt;
+      &lt;th&gt;reviews_per_month&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;https://www.airbnb.com/rooms/5065&lt;/td&gt;
+      &lt;td&gt;20210708132536&lt;/td&gt;
+      &lt;td&gt;2021-07-09&lt;/td&gt;
+      &lt;td&gt;MAUKA BB&lt;/td&gt;
+      &lt;td&gt;Perfect for your vacation, Staycation or just ...&lt;/td&gt;
+      &lt;td&gt;Neighbors here are friendly but are not really...&lt;/td&gt;
+      &lt;td&gt;https://a0.muscache.com/pictures/36718112/1f0e...&lt;/td&gt;
+      &lt;td&gt;7257&lt;/td&gt;
+      &lt;td&gt;https://www.airbnb.com/users/show/7257&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;4.71&lt;/td&gt;
+      &lt;td&gt;4.48&lt;/td&gt;
+      &lt;td&gt;4.76&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;f&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0.41&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;5269&lt;/td&gt;
+      &lt;td&gt;https://www.airbnb.com/rooms/5269&lt;/td&gt;
+      &lt;td&gt;20210708132536&lt;/td&gt;
+      &lt;td&gt;2021-07-09&lt;/td&gt;
+      &lt;td&gt;Upcountry Hospitality in the 'Auwai Suite&lt;/td&gt;
+      &lt;td&gt;The 'Auwai Suite is a lovely, self-contained a...&lt;/td&gt;
+      &lt;td&gt;We are located on the &quot;sunny side&quot; of Waimea, ...&lt;/td&gt;
+      &lt;td&gt;https://a0.muscache.com/pictures/5b52b72f-5a09...&lt;/td&gt;
+      &lt;td&gt;7620&lt;/td&gt;
+      &lt;td&gt;https://www.airbnb.com/users/show/7620&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;4.91&lt;/td&gt;
+      &lt;td&gt;5.00&lt;/td&gt;
+      &lt;td&gt;4.82&lt;/td&gt;
+      &lt;td&gt;119-269-5808-01R&lt;/td&gt;
+      &lt;td&gt;f&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;0.10&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;2 rows × 74 columns&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;df_listing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Index(['id', 'listing_url', 'scrape_id', 'last_scraped', 'name', 'description',
+       'neighborhood_overview', 'picture_url', 'host_id', 'host_url',
+       'host_name', 'host_since', 'host_location', 'host_about',
+       'host_response_time', 'host_response_rate', 'host_acceptance_rate',
+       'host_is_superhost', 'host_thumbnail_url', 'host_picture_url',
+       'host_neighbourhood', 'host_listings_count',
+       'host_total_listings_count', 'host_verifications',
+       'host_has_profile_pic', 'host_identity_verified', 'neighbourhood',
+       'neighbourhood_cleansed', 'neighbourhood_group_cleansed', 'latitude',
+       'longitude', 'property_type', 'room_type', 'accommodates', 'bathrooms',
+       'bathrooms_text', 'bedrooms', 'beds', 'amenities', 'price',
+       'minimum_nights', 'maximum_nights', 'minimum_minimum_nights',
+       'maximum_minimum_nights', 'minimum_maximum_nights',
+       'maximum_maximum_nights', 'minimum_nights_avg_ntm',
+       'maximum_nights_avg_ntm', 'calendar_updated', 'has_availability',
+       'availability_30', 'availability_60', 'availability_90',
+       'availability_365', 'calendar_last_scraped', 'number_of_reviews',
+       'number_of_reviews_ltm', 'number_of_reviews_l30d', 'first_review',
+       'last_review', 'review_scores_rating', 'review_scores_accuracy',
+       'review_scores_cleanliness', 'review_scores_checkin',
+       'review_scores_communication', 'review_scores_location',
+       'review_scores_value', 'license', 'instant_bookable',
+       'calculated_host_listings_count',
+       'calculated_host_listings_count_entire_homes',
+       'calculated_host_listings_count_private_rooms',
+       'calculated_host_listings_count_shared_rooms', 'reviews_per_month'],
+      dtype='object')
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;df_review&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div&gt;
+&lt;style scoped=&quot;&quot;&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&quot;1&quot; class=&quot;dataframe&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&quot;text-align: right;&quot;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;listing_id&lt;/th&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;date&lt;/th&gt;
+      &lt;th&gt;reviewer_id&lt;/th&gt;
+      &lt;th&gt;reviewer_name&lt;/th&gt;
+      &lt;th&gt;comments&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;3578629&lt;/td&gt;
+      &lt;td&gt;2013-02-18&lt;/td&gt;
+      &lt;td&gt;4574728&lt;/td&gt;
+      &lt;td&gt;Terry&lt;/td&gt;
+      &lt;td&gt;The place was difficult to find and communicat...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;4412184&lt;/td&gt;
+      &lt;td&gt;2013-05-03&lt;/td&gt;
+      &lt;td&gt;3067352&lt;/td&gt;
+      &lt;td&gt;Olivia&lt;/td&gt;
+      &lt;td&gt;Wayne was very friendly and his place is sweet...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;55331648&lt;/td&gt;
+      &lt;td&gt;2015-11-29&lt;/td&gt;
+      &lt;td&gt;33781202&lt;/td&gt;
+      &lt;td&gt;Elspeth And Adam Dobres&lt;/td&gt;
+      &lt;td&gt;We loved our time at this BnB! Beautiful surro...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;57598810&lt;/td&gt;
+      &lt;td&gt;2015-12-27&lt;/td&gt;
+      &lt;td&gt;12288841&lt;/td&gt;
+      &lt;td&gt;Lydia&lt;/td&gt;
+      &lt;td&gt;The organisation was very uncomplicated,\r&amp;lt;br/...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;5065&lt;/td&gt;
+      &lt;td&gt;58905911&lt;/td&gt;
+      &lt;td&gt;2016-01-05&lt;/td&gt;
+      &lt;td&gt;41538214&lt;/td&gt;
+      &lt;td&gt;Andrew&lt;/td&gt;
+      &lt;td&gt;Place was great for what we wanted. Be ready t...&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;df_listing contains all the metadata for all the listings and df_review has all the review information for each review associated with its list id. Noticed &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;listing_id&lt;/code&gt; in df_review is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;id&lt;/code&gt; in df_listing, it will be the key for our merging.&lt;/p&gt;
 
 &lt;h3 id=&quot;data-processing--the-number-of-reviews&quot;&gt;Data processing:  the number of reviews&lt;/h3&gt;
 
@@ -56,8 +297,6 @@
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;listing_reveived_review&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;process_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df_review&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;df_listing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;listing_reveived_review&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;output:&lt;/p&gt;
 
 &lt;div&gt;
 &lt;style scoped=&quot;&quot;&gt;
@@ -159,8 +398,6 @@
 &lt;span class=&quot;n&quot;&gt;count_per_day_honolulu&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;output:&lt;/p&gt;
-
 &lt;div&gt;
 &lt;style scoped=&quot;&quot;&gt;
     .dataframe tbody tr th:only-of-type {
@@ -253,7 +490,7 @@
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;avg_ts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fit_moving_avg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;Before visualizing&lt;/p&gt;
 
 &lt;h3 id=&quot;visualization&quot;&gt;Visualization&lt;/h3&gt;
 
@@ -263,17 +500,13 @@
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;figsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Number of reviews'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Number of Reviews over time'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fontsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;# plot moving average
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;avg_ts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Average number of reviews'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fontsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;legend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fontsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;legend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fontsize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;#plt.savefig('moving_avg.png')
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;output:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;output_29_0.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/coordinate_descent.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;insights&quot;&gt;Insights&lt;/h4&gt;
+&lt;p&gt;Insights&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -283,8 +516,6 @@
     &lt;p&gt;The number of reviews keeps increasing which indicates the popularity of Airbnb was thriving before the pandemic. Meanwhile there is a clear seasonality pattern before the mid of Feb, 2020.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;interactive-visualization-with-plotly&quot;&gt;Interactive visualization with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Plotly&lt;/code&gt;&lt;/h4&gt;
 
@@ -302,9 +533,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;iframe width=&quot;775&quot; height=&quot;500&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;iframe width=&quot;900&quot; height=&quot;800&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/2.embed&quot;&gt;&lt;/iframe&gt;
 
 &lt;h4 id=&quot;add-a-rangeselector&quot;&gt;Add a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rangeselector&lt;/code&gt;&lt;/h4&gt;
 
@@ -355,7 +584,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;iframe width=&quot;775&quot; height=&quot;500&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/4.embed&quot;&gt;&lt;/iframe&gt;
+&lt;iframe width=&quot;900&quot; height=&quot;800&quot; frameborder=&quot;0&quot; scrolling=&quot;no&quot; src=&quot;//plotly.com/~huyuan17/4.embed&quot;&gt;&lt;/iframe&gt;
 
 &lt;p&gt;Here I will include the code that pushes the plot oject to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;plotly express&lt;/code&gt;, which generates embedding information for hosting the interactive image on web pages.&lt;/p&gt;
 
@@ -367,13 +596,18 @@
 &lt;span class=&quot;n&quot;&gt;py&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fig2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'review_over_time'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;auto_open&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;'https://plotly.com/~huyuan17/2/'
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;py&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fig2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'review_over_time_rangeselector'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;auto_open&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;'https://plotly.com/~huyuan17/4/'
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;part-2-reviews-over-time-via-folium&quot;&gt;Part 2. Reviews over time via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt;&lt;/h2&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;data-processing&quot;&gt;Data processing&lt;/h3&gt;
+&lt;h3 id=&quot;data-processing&quot;&gt;Data processing:&lt;/h3&gt;
 
 &lt;h4 id=&quot;count-reviews-received-for-each-listing-each-month&quot;&gt;Count reviews received for each listing each month&lt;/h4&gt;
 
@@ -518,8 +752,6 @@
 &lt;/table&gt;
 &lt;p&gt;116724 rows × 5 columns&lt;/p&gt;
 &lt;/div&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;transform-data-to-the-form-that-folium-can-take&quot;&gt;Transform data to the form that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;folium&lt;/code&gt; can take&lt;/h4&gt;
 
@@ -751,8 +983,6 @@
 &lt;/table&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
 &lt;p&gt;Lastly, we just extract the repective &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;latitude&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;longitude&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;review_count&lt;/code&gt; to a final form for pass in to the plugin.&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# transform data for folium
@@ -780,8 +1010,6 @@
                       &lt;span class=&quot;n&quot;&gt;generate_location_points&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;listings_with_total_review_count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
 &lt;h3 id=&quot;visualization---click-display-button&quot;&gt;Visualization - click display button&lt;/h3&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# create folium object and add timestamp object
@@ -794,8 +1022,6 @@
 #time_map.save(&quot;index.html&quot;)
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
 &lt;h3 id=&quot;insight&quot;&gt;Insight&lt;/h3&gt;
 
 &lt;ul&gt;
@@ -804,7 +1030,7 @@
   &lt;li&gt;The trend showed from above matches the result acquired by matplotlib.&lt;/li&gt;
   &lt;li&gt;Moreover, timestamped visualization delivers a more approachable result to a variaty of audiences.&lt;/li&gt;
   &lt;li&gt;By taking advantage of geographaic information, we could monitor many other attributes as long as we render them with suitable weights.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Brian Hu</name></author><category term="EDA" /><category term="data-visulization" /><category term="tutorial" /><category term="time-series" /><category term="pandas" /><category term="folium" /><category term="plotly" /><summary type="html"></summary></entry><entry><title type="html">Building a “no sweat” word embeddings</title><link href="https://galaxie500.github.io/2021/07/03/word_embeddings.html" rel="alternate" type="text/html" title="Building a “no sweat” word embeddings" /><published>2021-07-03T00:00:00+00:00</published><updated>2021-07-03T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/07/03/word_embeddings</id><content type="html" xml:base="https://galaxie500.github.io/2021/07/03/word_embeddings.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Brian Hu</name></author><category term="EDA" /><category term="data-visulization" /><category term="tutorial" /><category term="time-series" /><category term="pandas" /><category term="folium" /><category term="plotly" /><summary type="html">Introduction</summary></entry><entry><title type="html">Building a “no sweat” word embeddings</title><link href="https://galaxie500.github.io/2021/07/03/word_embeddings.html" rel="alternate" type="text/html" title="Building a “no sweat” word embeddings" /><published>2021-07-03T00:00:00+00:00</published><updated>2021-07-03T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/07/03/word_embeddings</id><content type="html" xml:base="https://galaxie500.github.io/2021/07/03/word_embeddings.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;The large number of English words can make language-based applications daunting.  To cope with this, it is helpful to have a clustering or embedding of these words, so that words with similar meanings are clustered together, or have embeddings that are close to one another.&lt;/p&gt;
 
