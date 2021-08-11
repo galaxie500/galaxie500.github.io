@@ -57,7 +57,7 @@
  <title>brianHu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-11T02:04:18+00:00</updated>
+ <updated>2021-08-11T02:10:16+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -66,7 +66,7 @@
 
  
  <entry>
-   <title>Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin</title>
+   <title>Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title>
    <link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html"/>
    <updated>2021-08-10T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id>
@@ -340,7 +340,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/coordinate_descent.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/moving_avg.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:04:18+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
-</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime plugin" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://galaxie500.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://galaxie500.github.io/" rel="alternate" type="text/html" /><updated>2021-08-11T02:10:16+00:00</updated><id>https://galaxie500.github.io/feed.xml</id><title type="html">brianHu</title><subtitle>Current Master of Data Science Candidate @ Univ of California San Diego, Data Engineer Intern @ Gotion, I blog about stuff I learned form data cience, data engineer and big data analytics.
+</subtitle><author><name>Brian Hu</name></author><entry><title type="html">Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime</title><link href="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html" rel="alternate" type="text/html" title="Monitoring Airbnb reviews over COVID-19 with folium HeatMapWithTime" /><published>2021-08-10T00:00:00+00:00</published><updated>2021-08-10T00:00:00+00:00</updated><id>https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda</id><content type="html" xml:base="https://galaxie500.github.io/2021/08/10/airbnb-timeserie-eda.html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
@@ -269,7 +269,7 @@
 
 &lt;p&gt;output:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/coordinate_descent.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/moving_avg.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
