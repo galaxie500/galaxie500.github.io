@@ -2889,7 +2889,7 @@ readers do not read off random characters that represent icons */
 
 @font-face { font-family: "Roboto Mono"; src: url("/assets/fonts/RobotoMono-Medium.eot"); src: url("/assets/fonts/RobotoMono-Medium.eot?#iefix") format("embedded-opentype"), url("/assets/fonts/RobotoMono-Medium.woff") format("woff"), url("/assets/fonts/RobotoMono-Medium.ttf") format("truetype"), url("/assets/fonts/RobotoMono-Medium.svg#aller") format("svg"); font-weight: normal; font-style: normal; }
 
-.color-pink { color: #F24784 !important; }
+.color-pink { color: #330033 !important; }
 
 .color-red { color: #FC4957 !important; }
 
@@ -2909,7 +2909,7 @@ readers do not read off random characters that represent icons */
 
 .color-purple { color: #8E59D7 !important; }
 
-.color-pink-hover:hover { color: #F24784 !important; }
+.color-pink-hover:hover { color: #330033 !important; }
 
 .color-red-hover:hover { color: #FC4957 !important; }
 
@@ -2974,7 +2974,7 @@ video { width: 100%; border-radius: 0.3em; }
 h1, h2, h3, h4, h5, h6 { font-weight: 500; margin-top: 1em; margin-bottom: 0.4em; text-align: left; }
 
 /** Links */
-a { color: #F24784; text-decoration: none; }
+a { color: #330033; text-decoration: none; }
 
 a:hover { text-decoration: underline; }
 
@@ -3320,7 +3320,7 @@ input:checked + .toggle .star--6 { transition: all 300ms 400ms cubic-bezier(0.44
 
 .highlight .nb { color: #DAE4ED; }
 
-.highlight .nc { color: #F24784; }
+.highlight .nc { color: #330033; }
 
 .highlight .no { color: #DAE4ED; }
 
@@ -3328,7 +3328,7 @@ input:checked + .toggle .star--6 { transition: all 300ms 400ms cubic-bezier(0.44
 
 .highlight .ne { color: #900; font-weight: lighter; }
 
-.highlight .nf { color: #F24784; }
+.highlight .nf { color: #330033; }
 
 .highlight .nn { color: #DAE4ED; }
 
@@ -3372,11 +3372,11 @@ input:checked + .toggle .star--6 { transition: all 300ms 400ms cubic-bezier(0.44
 
 .highlight .bp { color: #999; }
 
-.highlight .vc { color: #F24784; }
+.highlight .vc { color: #330033; }
 
-.highlight .vg { color: #F24784; }
+.highlight .vg { color: #330033; }
 
-.highlight .vi { color: #F24784; }
+.highlight .vi { color: #330033; }
 
 .highlight .il { color: #EA9D53; }
 
