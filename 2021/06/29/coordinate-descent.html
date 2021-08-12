@@ -3,22 +3,22 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Solving Logistic Regression with Coordinate Descent in Three ways | Brian Hu</title>
+<title>Solving a Coordinate Descent in Three ways | Brian Hu</title>
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Solving Logistic Regression with Coordinate Descent in Three ways" />
+<meta property="og:title" content="Solving a Coordinate Descent in Three ways" />
 <meta name="author" content="Brian Hu" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="What is coordinate descent compared to gradient descent? How to solve it?" />
-<meta property="og:description" content="What is coordinate descent compared to gradient descent? How to solve it?" />
+<meta name="description" content="What is a coordinate descent compared to gradient descent? How to solve it?" />
+<meta property="og:description" content="What is a coordinate descent compared to gradient descent? How to solve it?" />
 <link rel="canonical" href="https://galaxie500.github.io/2021/06/29/coordinate-descent.html" />
 <meta property="og:url" content="https://galaxie500.github.io/2021/06/29/coordinate-descent.html" />
 <meta property="og:site_name" content="Brian Hu" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-06-29T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Solving Logistic Regression with Coordinate Descent in Three ways" />
+<meta property="twitter:title" content="Solving a Coordinate Descent in Three ways" />
 <script type="application/ld+json">
-{"description":"What is coordinate descent compared to gradient descent? How to solve it?","@type":"BlogPosting","headline":"Solving Logistic Regression with Coordinate Descent in Three ways","dateModified":"2021-06-29T00:00:00+00:00","datePublished":"2021-06-29T00:00:00+00:00","url":"https://galaxie500.github.io/2021/06/29/coordinate-descent.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2021/06/29/coordinate-descent.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
+{"description":"What is a coordinate descent compared to gradient descent? How to solve it?","@type":"BlogPosting","headline":"Solving a Coordinate Descent in Three ways","dateModified":"2021-06-29T00:00:00+00:00","datePublished":"2021-06-29T00:00:00+00:00","url":"https://galaxie500.github.io/2021/06/29/coordinate-descent.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://galaxie500.github.io/2021/06/29/coordinate-descent.html"},"author":{"@type":"Person","name":"Brian Hu"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
@@ -71,7 +71,7 @@ Master of Data Science Candidate @ Univ of California San Diego, Data Engineer I
 
 
 <div class="post">
-  <h1 class="post-title">Solving Logistic Regression with Coordinate Descent in Three ways</h1>
+  <h1 class="post-title">Solving a Coordinate Descent in Three ways</h1>
   
   <div class="post-tags">
       
@@ -79,14 +79,12 @@ Master of Data Science Candidate @ Univ of California San Diego, Data Engineer I
       
       <a class="tag" href="/tag/introduction/">introduction</a>
       
-      <a class="tag" href="/tag/logistic-regression/">logistic-regression</a>
-      
   </div>
   
   <div class="post-date">Published on 29 Jun 2021</div>
   
   <noscript>
-    <div class="post-description">What is coordinate descent compared to gradient descent? How to solve it?</div>
+    <div class="post-description">What is a coordinate descent compared to gradient descent? How to solve it?</div>
   </noscript>
   <div id="animated-post-description" class="post-description" style="display: none;"></div>
   
@@ -424,7 +422,7 @@ Fitting Loss:   -&gt; 0.3499041459249309
  var disqus_config = function () {
      this.page.url = 'https://galaxie500.github.io/2021/06/29/coordinate-descent.html';
      this.page.identifier = '/2021/06/29/coordinate-descent';
-     this.page.title = 'Solving Logistic Regression with Coordinate Descent in Three ways';
+     this.page.title = 'Solving a Coordinate Descent in Three ways';
  };
 
  (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
@@ -479,7 +477,7 @@ Fitting Loss:   -&gt; 0.3499041459249309
 
   
   <h2>all tags</h2>
-  <div class="tag-cloud"><a href="/tag/eda/" class="set-1">EDA</a> <a href="/tag/data-visulization/" class="set-1">data-visulization</a> <a href="/tag/folium/" class="set-1">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/logistic-regression/" class="set-1">logistic-regression</a> <a href="/tag/ml/" class="set-5">ml</a> <a href="/tag/nlp/" class="set-4">nlp</a> <a href="/tag/pandas/" class="set-1">pandas</a> <a href="/tag/plotly/" class="set-1">plotly</a> <a href="/tag/time-series/" class="set-1">time-series</a> <a href="/tag/tutorial/" class="set-2">tutorial</a></div>
+  <div class="tag-cloud"><a href="/tag/eda/" class="set-1">EDA</a> <a href="/tag/data-visulization/" class="set-1">data-visulization</a> <a href="/tag/folium/" class="set-1">folium</a> <a href="/tag/introduction/" class="set-5">introduction</a> <a href="/tag/ml/" class="set-5">ml</a> <a href="/tag/nlp/" class="set-4">nlp</a> <a href="/tag/pandas/" class="set-1">pandas</a> <a href="/tag/plotly/" class="set-1">plotly</a> <a href="/tag/time-series/" class="set-1">time-series</a> <a href="/tag/tutorial/" class="set-2">tutorial</a></div>
   
 
 
@@ -487,7 +485,7 @@ Fitting Loss:   -&gt; 0.3499041459249309
 
 <script>
   let i = 0;
-  const text = 'What is coordinate descent compared to gradient descent? How to solve it?';
+  const text = 'What is a coordinate descent compared to gradient descent? How to solve it?';
   const speed = parseInt('50');
   
   function typeWriter() {

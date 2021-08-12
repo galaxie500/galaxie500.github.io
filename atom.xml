@@ -57,7 +57,7 @@
  <title>Brian Hu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-12T07:39:11+00:00</updated>
+ <updated>2021-08-12T07:39:17+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -2549,7 +2549,7 @@ worship ------&amp;gt; organized
  </entry>
  
  <entry>
-   <title>Solving Logistic Regression with Coordinate Descent in Three ways</title>
+   <title>Solving a Coordinate Descent in Three ways</title>
    <link href="https://galaxie500.github.io/2021/06/29/coordinate-descent.html"/>
    <updated>2021-06-29T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2021/06/29/coordinate-descent</id>
@@ -2885,11 +2885,10 @@ Fitting Loss:   -&amp;gt; 0.3499041459249309
    <link href="https://galaxie500.github.io/2021/05/09/calibrated_estimation.html"/>
    <updated>2021-05-09T00:00:00+00:00</updated>
    <id>https://galaxie500.github.io/2021/05/09/calibrated_estimation</id>
-   <content type="html">&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;h3 id=&quot;data&quot;&gt;Data:&lt;/h3&gt;
-&lt;p&gt;3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;br /&gt;
+&lt;strong&gt;Data&lt;/strong&gt;: 3000 lines sentiment text data with labels 0 or 1&lt;/p&gt;
 
-&lt;h3 id=&quot;work-flow-explaination-to-the-methods-will-be-included-in-each-steps&quot;&gt;Work flow: (explaination to the methods will be included in each steps)&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Work flow&lt;/strong&gt;: (explaination to the methods will be included in each steps)&lt;/p&gt;
 &lt;ol&gt;
   &lt;li&gt;Text preprocessing
     &lt;ul&gt;
