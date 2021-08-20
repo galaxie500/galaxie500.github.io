@@ -57,7 +57,7 @@
  <title>Brian Hu</title>
  <link href="https://galaxie500.github.io/atom.xml" rel="self"/>
  <link href="https://galaxie500.github.io/"/>
- <updated>2021-08-20T06:32:26+00:00</updated>
+ <updated>2021-08-20T06:32:33+00:00</updated>
  <id>https://galaxie500.github.io</id>
  <author>
    <name></name>
@@ -3315,23 +3315,6 @@ To learn the monotonic transform:&lt;/p&gt;
     &lt;p&gt;For multiclass predictions, each class was calibrated separately in a OneVsRestClassifier fashion. When predicting probabilities, the calibrated probabilities for each class are predicted separately. As those probabilities do not necessarily sum to one, a postprocessing is performed to normalize them. References: &lt;a href=&quot;https://scikit-learn.org/stable/modules/calibration.html&quot;&gt;sklearn calibration&lt;/a&gt;&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
-</content>
- </entry>
- 
- <entry>
-   <title>Creating python virtual environment with pipenv</title>
-   <link href="https://galaxie500.github.io/2021/05/03/pipenv.html"/>
-   <updated>2021-05-03T00:00:00+00:00</updated>
-   <id>https://galaxie500.github.io/2021/05/03/pipenv</id>
-   <content type="html">&lt;p&gt;Generally, when we create a python project, we will need to create a virtual environment. The advantage of doing this enables us to distinguish the project environment from the operating system environment and to avoid messing up the operating system environment.&lt;/p&gt;
-
-&lt;p&gt;Another pain point is that once the development has been completed, we need to deploy the code to the production environment. At this time, if we don’t want to pip install all the packages from the development environment again. What should we do?&lt;/p&gt;
-
-&lt;p&gt;The answer is to use pipenv. As the name suggests, pipenv is a combination of pip and virtualenv.&lt;/p&gt;
-
-&lt;p&gt;installation
-create virtual environment
-other commands&lt;/p&gt;
 </content>
  </entry>
  
